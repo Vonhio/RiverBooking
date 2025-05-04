@@ -1,12 +1,11 @@
 package com.riverBooking.mapper;
 
 import com.riverBooking.entity.ReservaEntity;
-import com.riverBooking.entityDTO.BarcoEntityDTO;
 import com.riverBooking.entityDTO.ReservaEntityDTO;
 
 public class ReservaMapper {
 
-	public static ReservaEntity toEntity(ReservaEntityDTO dto, BarcoEntityDTO barco) {
+	public static ReservaEntity toEntity(ReservaEntityDTO dto) {
         ReservaEntity reserva = new ReservaEntity();
 
         reserva.setFechaReserva(dto.getFechaReserva());
@@ -17,7 +16,6 @@ public class ReservaMapper {
         reserva.setTelefono(dto.getTelefono());
         reserva.setEmail(dto.getEmail());
         reserva.setEstado(dto.getEstado());
-        reserva.setBarco(BarcoMapper.toEntity(barco));
         reserva.setPrecioTotal(dto.getPrecioTotal());
 
         return reserva;
@@ -34,8 +32,9 @@ public class ReservaMapper {
         reservaDTO.setTelefono(reservaEntity.getTelefono());
         reservaDTO.setEmail(reservaEntity.getEmail());
         reservaDTO.setEstado(reservaEntity.getEstado());
-        reservaDTO.setBarco(BarcoMapper.toDTO(reservaEntity.getBarco()));
+        reservaDTO.setBarcoId(reservaEntity.getBarco().getId());
         reservaDTO.setPrecioTotal(reservaEntity.getPrecioTotal());
+        reservaDTO.setCodigoReserva(reservaEntity.getCodigoReserva());
 		
 		return reservaDTO;
 	}

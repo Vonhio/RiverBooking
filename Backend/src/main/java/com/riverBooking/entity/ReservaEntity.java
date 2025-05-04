@@ -1,7 +1,7 @@
 package com.riverBooking.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
@@ -14,7 +14,7 @@ public class ReservaEntity {
 	private Long id;
 
 	@Column(name = "fecha_reserva", nullable = false)
-	private LocalDate fechaReserva;
+	private LocalDateTime fechaReserva;
 
 	@Column(name = "tipo_reserva", nullable = false)
 	private String tipoReserva;
@@ -50,7 +50,7 @@ public class ReservaEntity {
 	public ReservaEntity() {
 	}
 
-	public ReservaEntity(Long id, LocalDate fechaReserva, String tipoReserva, int numPersonas, String nombreCliente,
+	public ReservaEntity(Long id, LocalDateTime fechaReserva, String tipoReserva, int numPersonas, String nombreCliente,
 			String apellidoCliente, String telefono, String email, String estado, BarcoEntity tipoBarco,
 			BigDecimal precioTotal, String codigoReserva) {
 		this.id = id;
@@ -75,11 +75,11 @@ public class ReservaEntity {
 		this.id = id;
 	}
 
-	public LocalDate getFechaReserva() {
+	public LocalDateTime getFechaReserva() {
 		return fechaReserva;
 	}
 
-	public void setFechaReserva(LocalDate fechaReserva) {
+	public void setFechaReserva(LocalDateTime fechaReserva) {
 		this.fechaReserva = fechaReserva;
 	}
 

@@ -2,13 +2,13 @@ package com.riverBooking.entityDTO;
 
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ReservaEntityDTO {
 
 	@NotNull(message = "La fecha de la reserva es obligatoria")
 	@FutureOrPresent(message = "La fecha no puede ser anterior a hoy")
-	private LocalDate fechaReserva;
+	private LocalDateTime fechaReserva;
 
 	@NotBlank(message = "El tipo de reserva es obligatorio")
 	private String tipoReserva;
@@ -34,16 +34,19 @@ public class ReservaEntityDTO {
 	private String estado;
 
 	@NotNull(message = "Debe especificarse un barco")
-	private BarcoEntityDTO barco;
+	private Long barcoId;
 
 	@DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0")
 	private BigDecimal precioTotal;
+
+	@NotNull(message = "Debe especificarse un código de reserva.")
+	private String codigoReserva;
 
 	public ReservaEntityDTO() {
 	}
 
 	public ReservaEntityDTO(
-			@NotNull(message = "La fecha de la reserva es obligatoria") @FutureOrPresent(message = "La fecha no puede ser anterior a hoy") LocalDate fechaReserva,
+			@NotNull(message = "La fecha de la reserva es obligatoria") @FutureOrPresent(message = "La fecha no puede ser anterior a hoy") LocalDateTime fechaReserva,
 			@NotBlank(message = "El tipo de reserva es obligatorio") String tipoReserva,
 			@Min(value = 1, message = "Debe haber al menos 1 persona") int numPersonas,
 			@NotBlank(message = "El nombre del cliente es obligatorio") String nombreCliente,
@@ -51,8 +54,9 @@ public class ReservaEntityDTO {
 			@NotBlank(message = "El teléfono es obligatorio") @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "El teléfono debe tener exactamente 9 dígitos") String telefono,
 			@NotBlank(message = "El email es obligatorio") @Email(message = "El email no tiene un formato válido") String email,
 			@NotBlank(message = "El estado de la reserva es obligatorio") String estado,
-			@NotNull(message = "Debe especificarse un barco") BarcoEntityDTO barco,
-			@DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0") BigDecimal precioTotal) {
+			@NotNull(message = "Debe especificarse un barco") Long barcoId,
+			@DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0") BigDecimal precioTotal,
+			@NotNull(message = "Debe especificarse un código de reserva.") String codigoReserva) {
 		this.fechaReserva = fechaReserva;
 		this.tipoReserva = tipoReserva;
 		this.numPersonas = numPersonas;
@@ -61,15 +65,16 @@ public class ReservaEntityDTO {
 		this.telefono = telefono;
 		this.email = email;
 		this.estado = estado;
-		this.barco = barco;
+		this.barcoId = barcoId;
 		this.precioTotal = precioTotal;
+		this.codigoReserva = codigoReserva;
 	}
 
-	public LocalDate getFechaReserva() {
+	public LocalDateTime getFechaReserva() {
 		return fechaReserva;
 	}
 
-	public void setFechaReserva(LocalDate fechaReserva) {
+	public void setFechaReserva(LocalDateTime fechaReserva) {
 		this.fechaReserva = fechaReserva;
 	}
 
@@ -129,12 +134,12 @@ public class ReservaEntityDTO {
 		this.estado = estado;
 	}
 
-	public BarcoEntityDTO getBarco() {
-		return barco;
+	public Long getBarcoId() {
+		return barcoId;
 	}
 
-	public void setBarco(BarcoEntityDTO barco) {
-		this.barco = barco;
+	public void setBarcoId(Long barcoId) {
+		this.barcoId = barcoId;
 	}
 
 	public BigDecimal getPrecioTotal() {
@@ -144,4 +149,14 @@ public class ReservaEntityDTO {
 	public void setPrecioTotal(BigDecimal precioTotal) {
 		this.precioTotal = precioTotal;
 	}
+
+	public String getCodigoReserva() {
+		return codigoReserva;
+	}
+
+	public void setCodigoReserva(String codigoReserva) {
+		this.codigoReserva = codigoReserva;
+	}
+	
+	
 }

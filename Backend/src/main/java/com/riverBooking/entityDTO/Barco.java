@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-public class BarcoEntityDTO {
+public class Barco {
 
 	@NotBlank(message = "El nombre del barco no puede estar vacío")
 	private String nombre;
@@ -15,13 +15,13 @@ public class BarcoEntityDTO {
 
 	private String descripcion;
 
-	public BarcoEntityDTO(String nombre, int capacidad, String descripcion) {
+	public Barco(String nombre, int capacidad, String descripcion) {
 		this.nombre = nombre;
 		this.capacidad = capacidad;
 		this.descripcion = descripcion;
 	}
 
-	public BarcoEntityDTO() {
+	public Barco() {
 	}
 
 	public String getNombre() {

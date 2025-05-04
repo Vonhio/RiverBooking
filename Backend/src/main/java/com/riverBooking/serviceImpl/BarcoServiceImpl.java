@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.riverBooking.entity.BarcoEntity;
-import com.riverBooking.entityDTO.BarcoEntityDTO;
+import com.riverBooking.entityDTO.Barco;
 import com.riverBooking.mapper.BarcoMapper;
 import com.riverBooking.repository.BarcoRepository;
 import com.riverBooking.service.BarcoService;
@@ -21,9 +21,9 @@ public class BarcoServiceImpl implements BarcoService {
 	}
 
 	@Override
-	public List<BarcoEntityDTO> getAllBarcos() {
+	public List<Barco> getAllBarcos() {
 		List<BarcoEntity> barcos = barcoRepository.findAll();
-		List<BarcoEntityDTO> barcosDto = barcos.stream().map(barco -> BarcoMapper.toDTO(barco))
+		List<Barco> barcosDto = barcos.stream().map(barco -> BarcoMapper.toDTO(barco))
 				.collect(Collectors.toList());
 		return barcosDto;
 	}
