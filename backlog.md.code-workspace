@@ -1,0 +1,33 @@
+<<<<<<< HEAD
+# Backlog – RiverBooking Sevilla
+
+> **Leyenda prioridades (MoSCoW)**  
+> Must = imprescindible · Should = importante · Could = deseable · Won’t = fuera de alcance actual
+
+| ID | Prioridad | Título | Historia de usuario | Criterios de aceptación |
+|----|-----------|--------|---------------------|-------------------------|
+| **FU-1** | Must | Reservar barco | Como **CLIENTE anónimo**, quiero elegir barco → fecha → hora → n.º personas para confirmar mi reserva *online*. | CA-1: El calendario oculta los días sin plazas libres. <br>CA-2: Si la suma de personas excede la capacidad, el botón «Reservar» se desactiva y muestra «Plazas agotadas». <br>CA-3: `POST /reservas` devuelve **HTTP 201** con el ID en < 500 ms (p95) con 30 usuarios concurrentes medidos en JMeter. |
+| **FU-2** | Must | Gestionar reservas | Como **ADMIN logueado**, quiero listar, filtrar, editar y eliminar reservas para atender peticiones de los clientes. | CA-1: Filtros por código, barco, fecha y hora. <br>CA-2: Al modificar o borrar, el calendario público refleja el cambio en ≤ 10 s (estrategia último-guarda-gana). <br>CA-3: Se envía correo automático al cliente informando de la acción realizada. |
+| **FU-3** | Must | Iniciar sesión | Como **ADMIN**, quiero autenticarme y recibir un token **JWT** de 24 h para acceder al panel privado. | CA-1: Credenciales válidas → **HTTP 200** + JWT. <br>CA-2: Token expirado → **HTTP 401**. <br>CA-3: No existe endpoint público de alta de usuarios. |
+| **FU-4** | Must | Confirmar reserva | Como **CLIENTE** y **ADMIN**, quiero recibir un correo de confirmación con los datos y código de reserva para tener constancia de la operación. | CA-1: El correo se envía ≤ 30 s tras crear o editar la reserva. <br>CA-2: Plantilla distinta para cliente (incluye código) y para admin (resumen completo). |
+| **FU-5** | Must | Cancelar reserva | Como **ADMIN**, quiero cancelar reservas existentes para liberar plazas y avisar al cliente. | CA-1: Al cancelar, la reserva se elimina y las plazas quedan libres al instante. <br>CA-2: Correo al cliente notificando la cancelación. <br>CA-3: API devuelve **HTTP 204** en éxito y **HTTP 404** si la reserva no existe. |
+| **NF-1** | Must | Rendimiento de la API | Como **DESARROLLADOR**, quiero que los endpoints respondan rápido para garantizar una buena UX. | CA-1: 95 % de las peticiones GET/POST clave responden < 500 ms con 30 usuarios concurrentes (JMeter). <br>CA-2: Uso de CPU del servidor < 70 % durante la prueba. |
+| **NF-2** | Must | Seguridad | Como **ADMIN**, quiero proteger el área privada para evitar accesos indebidos. | CA-1: Rutas `/api/admin/**` exigen JWT válido (HTTP 401 si falta o expira). <br>CA-2: Contraseñas almacenadas con **BCrypt** (≥ 10 salt rounds). <br>CA-3: OWASP ZAP sin vulnerabilidades de severidad alta. |
+| **NF-3** | Should | Accesibilidad | Como **USUARIO con limitaciones visuales**, quiero navegar sin barreras para completar reservas cómodamente. | CA-1: Puntuación ≥ 90/100 en “Accessibility” (Lighthouse). <br>CA-2: Todo el flujo usable solo con teclado. <br>CA-3: Contraste de texto cumple WCAG 2.1 nivel AA. |
+=======
+# Backlog – RiverBooking Sevilla
+
+> **Leyenda prioridades (MoSCoW)**  
+> Must = imprescindible · Should = importante · Could = deseable · Won’t = fuera de alcance actual
+
+| ID | Prioridad | Título | Historia de usuario | Criterios de aceptación |
+|----|-----------|--------|---------------------|-------------------------|
+| **FU-1** | Must | Reservar barco | Como **CLIENTE anónimo**, quiero elegir barco → fecha → hora → n.º personas para confirmar mi reserva *online*. | CA-1: El calendario oculta los días sin plazas libres. <br>CA-2: Si la suma de personas excede la capacidad, el botón «Reservar» se desactiva y muestra «Plazas agotadas». <br>CA-3: `POST /reservas` devuelve **HTTP 201** con el ID en < 500 ms (p95) con 30 usuarios concurrentes medidos en JMeter. |
+| **FU-2** | Must | Gestionar reservas | Como **ADMIN logueado**, quiero listar, filtrar, editar y eliminar reservas para atender peticiones de los clientes. | CA-1: Filtros por código, barco, fecha y hora. <br>CA-2: Al modificar o borrar, el calendario público refleja el cambio en ≤ 10 s (estrategia último-guarda-gana). <br>CA-3: Se envía correo automático al cliente informando de la acción realizada. |
+| **FU-3** | Must | Iniciar sesión | Como **ADMIN**, quiero autenticarme y recibir un token **JWT** de 24 h para acceder al panel privado. | CA-1: Credenciales válidas → **HTTP 200** + JWT. <br>CA-2: Token expirado → **HTTP 401**. <br>CA-3: No existe endpoint público de alta de usuarios. |
+| **FU-4** | Must | Confirmar reserva | Como **CLIENTE** y **ADMIN**, quiero recibir un correo de confirmación con los datos y código de reserva para tener constancia de la operación. | CA-1: El correo se envía ≤ 30 s tras crear o editar la reserva. <br>CA-2: Plantilla distinta para cliente (incluye código) y para admin (resumen completo). |
+| **FU-5** | Must | Cancelar reserva | Como **ADMIN**, quiero cancelar reservas existentes para liberar plazas y avisar al cliente. | CA-1: Al cancelar, la reserva se elimina y las plazas quedan libres al instante. <br>CA-2: Correo al cliente notificando la cancelación. <br>CA-3: API devuelve **HTTP 204** en éxito y **HTTP 404** si la reserva no existe. |
+| **NF-1** | Must | Rendimiento de la API | Como **DESARROLLADOR**, quiero que los endpoints respondan rápido para garantizar una buena UX. | CA-1: 95 % de las peticiones GET/POST clave responden < 500 ms con 30 usuarios concurrentes (JMeter). <br>CA-2: Uso de CPU del servidor < 70 % durante la prueba. |
+| **NF-2** | Must | Seguridad | Como **ADMIN**, quiero proteger el área privada para evitar accesos indebidos. | CA-1: Rutas `/api/admin/**` exigen JWT válido (HTTP 401 si falta o expira). <br>CA-2: Contraseñas almacenadas con **BCrypt** (≥ 10 salt rounds). <br>CA-3: OWASP ZAP sin vulnerabilidades de severidad alta. |
+| **NF-3** | Should | Accesibilidad | Como **USUARIO con limitaciones visuales**, quiero navegar sin barreras para completar reservas cómodamente. | CA-1: Puntuación ≥ 90/100 en “Accessibility” (Lighthouse). <br>CA-2: Todo el flujo usable solo con teclado. <br>CA-3: Contraste de texto cumple WCAG 2.1 nivel AA. |
+>>>>>>> af0174f442692ee7160bfc8efdd30273334d3f7b
