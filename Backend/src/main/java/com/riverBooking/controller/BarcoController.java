@@ -2,6 +2,7 @@ package com.riverBooking.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class BarcoController {
 
 	// Devuelve un JSON con todos los tipos de barcos existentes
 	@GetMapping("/barcos")
-	public List<BarcoEntityDTO> getAllBarcos() {
-		return barcoService.getAllBarcos();
+	public ResponseEntity<List<BarcoEntityDTO>> getAllBarcos() {
+		return ResponseEntity.ok(barcoService.getAllBarcos());
 	}
 }
