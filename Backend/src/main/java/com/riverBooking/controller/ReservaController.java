@@ -42,6 +42,19 @@ public class ReservaController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
+	
+	@PutMapping("/modificar/{id}")
+	public ResponseEntity<?> modificarReserva(@PathVariable Long id, @RequestBody @Valid ReservaEntityDTO reservaEntityDto){
+		try {
+			if(reservaService.modificarReserva(id, reservaEntityDto)) {
+				return ResponseEntity.ok(reservaEntityDto);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reserva no encontrada");
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 
 	@DeleteMapping("/eliminar/{id}")
 	public ResponseEntity<?> eliminarReserva(@PathVariable Long id){

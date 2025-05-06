@@ -4,8 +4,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-public class Barco {
+public class BarcoDTO {
 
+	private Long id;
+	
 	@NotBlank(message = "El nombre del barco no puede estar vacío")
 	private String nombre;
 
@@ -15,13 +17,14 @@ public class Barco {
 
 	private String descripcion;
 
-	public Barco(String nombre, int capacidad, String descripcion) {
+	public BarcoDTO(Long id, String nombre, int capacidad, String descripcion) {
+		this.id = id;
 		this.nombre = nombre;
 		this.capacidad = capacidad;
 		this.descripcion = descripcion;
 	}
 
-	public Barco() {
+	public BarcoDTO() {
 	}
 
 	public String getNombre() {
@@ -46,6 +49,14 @@ public class Barco {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }
