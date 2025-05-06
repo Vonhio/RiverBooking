@@ -40,11 +40,11 @@ public class ReservaServiceImpl implements ReservaService {
 
 			String codigoReserva = generarCodigoReserva(reserva.getNombreCliente(), reserva.getApellidoCliente());
 			reserva.setCodigoReserva(codigoReserva);
-			
+
 			BarcoEntity barco = barcoRepository.findById(reservaDto.getBarcoId())
 					.orElseThrow(() -> new RuntimeException("No se ha encontrado ningun barco con este ID"));
 			reserva.setBarco(barco);
-			
+
 			ReservaEntity reservaGuardada = reservaRepository.save(reserva);
 			return ReservaMapper.toDTO(reservaGuardada);
 
@@ -54,33 +54,39 @@ public class ReservaServiceImpl implements ReservaService {
 	}
 
 	@Override
-	public ReservaEntityDTO modificarReserva(String codigoReserva, ReservaEntityDTO reservaDto) {
-		// TODO Auto-generated method stub
+	public ReservaEntityDTO modificarReserva(Long id, ReservaEntityDTO reservaDto) {
+		try {
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error al modificar la reserva");
+		}
 		return null;
 	}
 
 	@Override
-	public void eliminarReserva(String codigoReserva) {
-		// TODO Auto-generated method stub
-
+	public void eliminarReserva(Long id) {
+		if (!reservaRepository.existsById(id)) {
+			throw new RuntimeException("No existe la reserva seleccionada.");
+		}
+		reservaRepository.deleteById(id);
 	}
 
 	private String generarCodigoReserva(String nombre, String apellido) {
 		String codigoReserva;
-		
+
 		do {
-		nombre = nombre.trim().toUpperCase();
-		apellido = apellido.trim().toUpperCase();
+			nombre = nombre.trim().toUpperCase();
+			apellido = apellido.trim().toUpperCase();
 
-		String parteNombre = nombre.length() >= 3 ? nombre.substring(0, 3) : nombre;
-		String parteApellido = apellido.length() >= 3 ? apellido.substring(0, 3) : apellido;
+			String parteNombre = nombre.length() >= 3 ? nombre.substring(0, 3) : nombre;
+			String parteApellido = apellido.length() >= 3 ? apellido.substring(0, 3) : apellido;
 
-		int numero = (int) (Math.random() * 1000);
-		String parteNumero = String.format("%03d", numero);
+			int numero = (int) (Math.random() * 1000);
+			String parteNumero = String.format("%03d", numero);
 
-		codigoReserva = parteNombre + parteApellido + parteNumero;
+			codigoReserva = parteNombre + parteApellido + parteNumero;
 		} while (reservaRepository.existsByCodigoReserva(codigoReserva));
-		
+
 		return codigoReserva;
 	}
 }

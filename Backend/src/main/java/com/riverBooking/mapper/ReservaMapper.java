@@ -8,6 +8,7 @@ public class ReservaMapper {
 	public static ReservaEntity toEntity(ReservaEntityDTO dto) {
         ReservaEntity reserva = new ReservaEntity();
 
+        reserva.setId(dto.getId());
         reserva.setFechaReserva(dto.getFechaReserva());
         reserva.setTipoReserva(dto.getTipoReserva());
         reserva.setNumPersonas(dto.getNumPersonas());
@@ -24,6 +25,7 @@ public class ReservaMapper {
 	public static ReservaEntityDTO toDTO(ReservaEntity reservaEntity) {
 		ReservaEntityDTO reservaDTO = new ReservaEntityDTO();
 		
+		reservaDTO.setId(reservaEntity.getId());
 		reservaDTO.setFechaReserva(reservaEntity.getFechaReserva());
         reservaDTO.setTipoReserva(reservaEntity.getTipoReserva());
         reservaDTO.setNumPersonas(reservaEntity.getNumPersonas());

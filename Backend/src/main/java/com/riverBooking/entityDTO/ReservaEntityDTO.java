@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 public class ReservaEntityDTO {
 
+	private Long id;
+	
 	@NotNull(message = "La fecha de la reserva es obligatoria")
 	@FutureOrPresent(message = "La fecha no puede ser anterior a hoy")
 	private LocalDateTime fechaReserva;
@@ -39,13 +41,13 @@ public class ReservaEntityDTO {
 	@DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0")
 	private BigDecimal precioTotal;
 
-	@NotNull(message = "Debe especificarse un código de reserva.")
 	private String codigoReserva;
 
 	public ReservaEntityDTO() {
 	}
 
 	public ReservaEntityDTO(
+			Long id,
 			@NotNull(message = "La fecha de la reserva es obligatoria") @FutureOrPresent(message = "La fecha no puede ser anterior a hoy") LocalDateTime fechaReserva,
 			@NotBlank(message = "El tipo de reserva es obligatorio") String tipoReserva,
 			@Min(value = 1, message = "Debe haber al menos 1 persona") int numPersonas,
@@ -57,6 +59,7 @@ public class ReservaEntityDTO {
 			@NotNull(message = "Debe especificarse un barco") Long barcoId,
 			@DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor que 0") BigDecimal precioTotal,
 			@NotNull(message = "Debe especificarse un código de reserva.") String codigoReserva) {
+		this.id = id;
 		this.fechaReserva = fechaReserva;
 		this.tipoReserva = tipoReserva;
 		this.numPersonas = numPersonas;
@@ -156,6 +159,14 @@ public class ReservaEntityDTO {
 
 	public void setCodigoReserva(String codigoReserva) {
 		this.codigoReserva = codigoReserva;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	
