@@ -1,5 +1,6 @@
 package com.riverBooking.serviceImpl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.riverBooking.entity.BarcoEntity;
 import com.riverBooking.entity.ReservaEntity;
+import com.riverBooking.entityDTO.InformacionReservasDTO;
 import com.riverBooking.entityDTO.ReservaEntityDTO;
 import com.riverBooking.mapper.ReservaMapper;
 import com.riverBooking.repository.BarcoRepository;
@@ -56,25 +58,27 @@ public class ReservaServiceImpl implements ReservaService {
 	@Override
 	public boolean modificarReserva(Long id, ReservaEntityDTO reservaDto) {
 		try {
-			if(reservaRepository.existsById(id)) {
+			if (reservaRepository.existsById(id)) {
 				ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
 				reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
-				
+
 				// Se comprueba si el Barco ha cambiado
-				ReservaEntity reserva = reservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
-				if(reserva.getBarco().getId() != reservaDto.getBarcoId()) {
-					BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId()).orElseThrow(() -> new RuntimeException("Barco no encontrado"));
+				ReservaEntity reserva = reservaRepository.findById(id)
+						.orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+				if (reserva.getBarco().getId() != reservaDto.getBarcoId()) {
+					BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId())
+							.orElseThrow(() -> new RuntimeException("Barco no encontrado"));
 					reservaMod.setBarco(barcoMod);
 				} else {
 					reservaMod.setBarco(reserva.getBarco());
 				}
-				
+
 				reservaRepository.save(reservaMod);
 				return true;
 			}
-			
+
 			return false;
-			
+
 		} catch (Exception e) {
 			throw new RuntimeException("Error al modificar la reserva");
 		}
@@ -105,5 +109,22 @@ public class ReservaServiceImpl implements ReservaService {
 		} while (reservaRepository.existsByCodigoReserva(codigoReserva));
 
 		return codigoReserva;
+	}
+
+	@Override
+	public InformacionReservasDTO getInfoReservas(LocalDateTime fechaHora, Long barcoId) {
+		
+		try {
+			BarcoEntity barco = barcoRepository.findById(barcoId).orElseThrow(() -> new RuntimeException("Barco no encontrado"));
+			
+			int plazasTotales = barco.getCapacidad();
+			int plazasOcupadas = reservaRepository.numeroPlazasReservadas(fechaHora, barcoId);
+			int plazasLibres = plazasTotales - plazasOcupadas;
+			
+			InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres);
+			return infoPlazas;
+		} catch (RuntimeException e) {
+			throw new RuntimeException("Error al consultar la información de las plazas");
+		}
 	}
 }

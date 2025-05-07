@@ -1,5 +1,7 @@
 package com.riverBooking.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.riverBooking.entityDTO.ReservaEntityDTO;
@@ -68,4 +71,21 @@ public class ReservaController {
 		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al eliminar la reserva");
 	}
+	
+	@GetMapping("/plazasLibres")
+	public ResponseEntity<?> infoPlazas(@RequestParam LocalDateTime fechaHora, @RequestParam Long barcoId){
+		try {
+			return ResponseEntity.ok(reservaService.getInfoReservas(fechaHora, barcoId));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 }
+
+
+
+
+
+
+
+
