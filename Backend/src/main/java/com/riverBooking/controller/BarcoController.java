@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.riverBooking.service.BarcoService;
 
 @RestController
-@RequestMapping("/tipos")
+@RequestMapping("/barcos")
 public class BarcoController {
 
 	private final BarcoService barcoService;
@@ -19,7 +19,7 @@ public class BarcoController {
 	}
 
 	// Devuelve un JSON con todos los tipos de barcos existentes
-	@GetMapping("/barcos")
+	@GetMapping
 	public ResponseEntity<?> getAllBarcos() {
 		try {
 			return ResponseEntity.ok(barcoService.getAllBarcos());

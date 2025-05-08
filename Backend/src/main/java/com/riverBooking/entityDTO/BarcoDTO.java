@@ -15,9 +15,12 @@ public class BarcoDTO {
 	@Max(value = 14, message = "El barco no puede superar las 14 plazas")
 	private int capacidad;
 
+	@NotBlank
 	private String descripcion;
 
-	public BarcoDTO(Long id, String nombre, int capacidad, String descripcion) {
+	public BarcoDTO(Long id, @NotBlank(message = "El nombre del barco no puede estar vacío") String nombre,
+			@Min(value = 1, message = "Debe haber al menos una plaza") @Max(value = 14, message = "El barco no puede superar las 14 plazas") int capacidad,
+			@NotBlank String descripcion) {
 		this.id = id;
 		this.nombre = nombre;
 		this.capacidad = capacidad;
