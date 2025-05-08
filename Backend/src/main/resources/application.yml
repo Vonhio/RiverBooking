@@ -14,4 +14,7 @@ spring:
         format_sql: true
   jackson:
     time-zone: Europe/Madrid
-    date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd HH:mm:ss	
+jwt:
+  secret: "CLAVE_SECRETA_DESARROLLO_32_BYTES_MINIMO_1234"
+  expiration-ms: 86400000
