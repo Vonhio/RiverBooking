@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuario")
-public class Usuario {
+public class UsuarioEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +24,10 @@ public class Usuario {
 	@Column(name = "rol", nullable = false)
 	private String rol;
 
-	public Usuario() {
+	public UsuarioEntity() {
 	}
 
-	public Usuario(Long id, String usuario, String password, String rol) {
+	public UsuarioEntity(Long id, String usuario, String password, String rol) {
 		this.id = id;
 		this.usuario = usuario;
 		this.password = password;
