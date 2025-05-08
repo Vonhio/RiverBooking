@@ -28,7 +28,7 @@ public class ReservaController {
 		this.reservaService = reservaService;
 	}
 
-	@GetMapping("/lista")
+	@GetMapping
 	public ResponseEntity<?> getAllReservas() {
 		try {
 			return ResponseEntity.ok(reservaService.getAllReservas());
@@ -66,7 +66,7 @@ public class ReservaController {
 		}
 	}
 
-	@GetMapping("/plazasLibres")
+	@GetMapping("/plazas")
 	public ResponseEntity<?> infoPlazas(@RequestParam LocalDateTime fechaHora, @RequestParam Long barcoId) {
 		try {
 			return ResponseEntity.ok(reservaService.getInfoReservas(fechaHora, barcoId));
