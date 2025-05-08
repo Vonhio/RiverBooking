@@ -32,7 +32,7 @@ public class ReservaController {
 	public ResponseEntity<?> getAllReservas() {
 		try {
 			return ResponseEntity.ok(reservaService.getAllReservas());
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
@@ -41,51 +41,37 @@ public class ReservaController {
 	public ResponseEntity<?> guardarReserva(@RequestBody @Valid ReservaEntityDTO reservaEntityDto) {
 		try {
 			return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.crearReserva(reservaEntityDto));
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
-	
+
 	@PutMapping("/modificar/{id}")
-	public ResponseEntity<?> modificarReserva(@PathVariable Long id, @RequestBody @Valid ReservaEntityDTO reservaEntityDto){
+	public ResponseEntity<?> modificarReserva(@PathVariable Long id,
+			@RequestBody @Valid ReservaEntityDTO reservaEntityDto) {
 		try {
-			if(reservaService.modificarReserva(id, reservaEntityDto)) {
-				return ResponseEntity.ok(reservaEntityDto);
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reserva no encontrada");
-			}
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+			return ResponseEntity.ok(reservaService.modificarReserva(id, reservaEntityDto));
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
 
 	@DeleteMapping("/eliminar/{id}")
-	public ResponseEntity<?> eliminarReserva(@PathVariable Long id){
+	public ResponseEntity<?> eliminarReserva(@PathVariable Long id) {
 		try {
 			reservaService.eliminarReserva(id);
-			return ResponseEntity.noContent().build();		
+			return ResponseEntity.noContent().build();
 		} catch (RuntimeException e) {
-			if("No existe la reserva seleccionada.".equals(e.getMessage())){
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-			}
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al eliminar la reserva");
 	}
-	
+
 	@GetMapping("/plazasLibres")
-	public ResponseEntity<?> infoPlazas(@RequestParam LocalDateTime fechaHora, @RequestParam Long barcoId){
+	public ResponseEntity<?> infoPlazas(@RequestParam LocalDateTime fechaHora, @RequestParam Long barcoId) {
 		try {
 			return ResponseEntity.ok(reservaService.getInfoReservas(fechaHora, barcoId));
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 }
-
-
-
-
-
-
-
-

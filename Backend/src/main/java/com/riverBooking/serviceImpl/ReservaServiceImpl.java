@@ -40,6 +40,14 @@ public class ReservaServiceImpl implements ReservaService {
 		try {
 			ReservaEntity reserva = ReservaMapper.toEntity(reservaDto);
 
+			int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
+					.getPlazasDisponibles();
+			boolean hayEspacio = reservaDto.getNumPersonas() <= plazasDisponibles;
+
+			if (!hayEspacio) {
+				throw new RuntimeException("El numero de plazas reservadas supera el numero de plazas disponibles");
+			}
+
 			String codigoReserva = generarCodigoReserva(reserva.getNombreCliente(), reserva.getApellidoCliente());
 			reserva.setCodigoReserva(codigoReserva);
 
@@ -51,36 +59,41 @@ public class ReservaServiceImpl implements ReservaService {
 			return ReservaMapper.toDTO(reservaGuardada);
 
 		} catch (Exception e) {
-			throw new RuntimeException("Error al crear la reserva.");
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 
 	@Override
-	public boolean modificarReserva(Long id, ReservaEntityDTO reservaDto) {
+	public ReservaEntityDTO modificarReserva(Long id, ReservaEntityDTO reservaDto) {
 		try {
-			if (reservaRepository.existsById(id)) {
-				ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
-				reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
 
-				// Se comprueba si el Barco ha cambiado
-				ReservaEntity reserva = reservaRepository.findById(id)
-						.orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
-				if (reserva.getBarco().getId() != reservaDto.getBarcoId()) {
-					BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId())
-							.orElseThrow(() -> new RuntimeException("Barco no encontrado"));
-					reservaMod.setBarco(barcoMod);
-				} else {
-					reservaMod.setBarco(reserva.getBarco());
-				}
+			ReservaEntity reserva = reservaRepository.findById(id)
+					.orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
 
-				reservaRepository.save(reservaMod);
-				return true;
+			ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
+
+			int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
+					.getPlazasDisponibles();
+			int plazasAñadidas = reservaDto.getNumPersonas() - reserva.getNumPersonas();
+			boolean barcoCambiado = reserva.getBarco().getId().equals(reservaDto.getBarcoId());
+
+			// Se comprueba si el Barco ha cambiado
+			if (!barcoCambiado && reservaDto.getNumPersonas() <= plazasDisponibles) {
+				BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId())
+						.orElseThrow(() -> new RuntimeException("Barco no encontrado"));
+				reservaMod.setBarco(barcoMod);
+			} else if (barcoCambiado && (plazasAñadidas < 0 || plazasAñadidas <= plazasDisponibles)) {
+				reservaMod.setBarco(reserva.getBarco());
+			} else {
+				throw new RuntimeException("El numero de plazas a modificar es superior a las plazas disponibles");
 			}
 
-			return false;
+			reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
+			reservaRepository.save(reservaMod);
+			return ReservaMapper.toDTO(reservaMod);
 
 		} catch (Exception e) {
-			throw new RuntimeException("Error al modificar la reserva");
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 
@@ -113,18 +126,19 @@ public class ReservaServiceImpl implements ReservaService {
 
 	@Override
 	public InformacionReservasDTO getInfoReservas(LocalDateTime fechaHora, Long barcoId) {
-		
+
 		try {
-			BarcoEntity barco = barcoRepository.findById(barcoId).orElseThrow(() -> new RuntimeException("Barco no encontrado"));
-			
+			BarcoEntity barco = barcoRepository.findById(barcoId)
+					.orElseThrow(() -> new RuntimeException("Barco no encontrado"));
+
 			int plazasTotales = barco.getCapacidad();
 			int plazasOcupadas = reservaRepository.numeroPlazasReservadas(fechaHora, barcoId);
 			int plazasLibres = plazasTotales - plazasOcupadas;
-			
+
 			InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres);
 			return infoPlazas;
 		} catch (RuntimeException e) {
-			throw new RuntimeException("Error al consultar la información de las plazas");
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 }
