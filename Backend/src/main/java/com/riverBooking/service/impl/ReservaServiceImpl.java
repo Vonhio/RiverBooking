@@ -1,4 +1,4 @@
-package com.riverBooking.serviceImpl;
+package com.riverBooking.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;

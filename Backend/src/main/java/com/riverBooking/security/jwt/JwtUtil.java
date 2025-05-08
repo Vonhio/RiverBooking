@@ -1,4 +1,4 @@
-package com.riverBooking.security;
+package com.riverBooking.security.jwt;
 
 import java.util.Date;
 

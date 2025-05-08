@@ -1,4 +1,4 @@
-package com.riverBooking.security;
+package com.riverBooking.security.service;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

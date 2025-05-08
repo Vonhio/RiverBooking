@@ -1,4 +1,4 @@
-package com.riverBooking.serviceImpl;
+package com.riverBooking.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
