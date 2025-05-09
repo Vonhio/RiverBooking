@@ -15,6 +15,17 @@ spring:
   jackson:
     time-zone: Europe/Madrid
     date-format: yyyy-MM-dd HH:mm:ss	
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: 6e2729ad84ff66
+    password: 27d52a929d00a1
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 jwt:
   secret: "CLAVE_SECRETA_DESARROLLO_32_BYTES_MINIMO_1234"
   expiration-ms: 86400000

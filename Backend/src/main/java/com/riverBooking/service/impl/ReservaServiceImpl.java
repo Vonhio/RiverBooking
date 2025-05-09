@@ -16,6 +16,7 @@ import com.riverBooking.exception.ReservaNoEncontradaException;
 import com.riverBooking.mapper.ReservaMapper;
 import com.riverBooking.repository.BarcoRepository;
 import com.riverBooking.repository.ReservaRepository;
+import com.riverBooking.service.MailService;
 import com.riverBooking.service.ReservaService;
 import com.riverBooking.util.GeneradorCodigo;
 
@@ -25,12 +26,14 @@ public class ReservaServiceImpl implements ReservaService {
 	private final ReservaRepository reservaRepository;
 	private final BarcoRepository barcoRepository;
 	private final GeneradorCodigo generadorCodigo;
+	private final MailService mailService;
 
 	public ReservaServiceImpl(ReservaRepository reservaRepository, BarcoRepository barcoRepository,
-			GeneradorCodigo generadorCodigo) {
+			GeneradorCodigo generadorCodigo, MailService mailService) {
 		this.reservaRepository = reservaRepository;
 		this.barcoRepository = barcoRepository;
 		this.generadorCodigo = generadorCodigo;
+		this.mailService = mailService;
 	}
 
 	@Override
@@ -68,6 +71,7 @@ public class ReservaServiceImpl implements ReservaService {
 		reserva.setBarco(barco);
 
 		ReservaEntity reservaGuardada = reservaRepository.save(reserva);
+		mailService.enviarEmail(reservaGuardada);
 		return ReservaMapper.toDTO(reservaGuardada);
 	}
 
