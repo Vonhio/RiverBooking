@@ -17,16 +17,20 @@ import com.riverBooking.mapper.ReservaMapper;
 import com.riverBooking.repository.BarcoRepository;
 import com.riverBooking.repository.ReservaRepository;
 import com.riverBooking.service.ReservaService;
+import com.riverBooking.util.GeneradorCodigo;
 
 @Service
 public class ReservaServiceImpl implements ReservaService {
 
 	private final ReservaRepository reservaRepository;
 	private final BarcoRepository barcoRepository;
+	private final GeneradorCodigo generadorCodigo;
 
-	public ReservaServiceImpl(ReservaRepository reservaRepository, BarcoRepository barcoRepository) {
+	public ReservaServiceImpl(ReservaRepository reservaRepository, BarcoRepository barcoRepository,
+			GeneradorCodigo generadorCodigo) {
 		this.reservaRepository = reservaRepository;
 		this.barcoRepository = barcoRepository;
+		this.generadorCodigo = generadorCodigo;
 	}
 
 	@Override
@@ -40,54 +44,47 @@ public class ReservaServiceImpl implements ReservaService {
 	@Override
 	public ReservaEntityDTO crearReserva(ReservaEntityDTO reservaDto) {
 
-			ReservaEntity reserva = ReservaMapper.toEntity(reservaDto);
+		ReservaEntity reserva = ReservaMapper.toEntity(reservaDto);
 
-			int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
-					.getPlazasDisponibles();
-			boolean hayEspacio = reservaDto.getNumPersonas() <= plazasDisponibles;
+		int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
+				.getPlazasDisponibles();
+		boolean hayEspacio = reservaDto.getNumPersonas() <= plazasDisponibles;
 
-			if (!hayEspacio) {
-				throw new PlazasInsuficientesException("El numero de plazas reservadas supera el numero de plazas disponibles");
-			}
+		if (!hayEspacio) {
+			throw new PlazasInsuficientesException(
+					"El numero de plazas reservadas supera el numero de plazas disponibles");
+		}
 
-			String codigoReserva = generarCodigoReserva(reserva.getNombreCliente(), reserva.getApellidoCliente());
-			reserva.setCodigoReserva(codigoReserva);
+		String codigoReserva;
+		do {
+			codigoReserva = generadorCodigo.codigoReserva(reservaDto.getNombreCliente(), reservaDto.getApellidoCliente());
+		} while (reservaRepository.existsByCodigoReserva(codigoReserva));
 
-			BarcoEntity barco = barcoRepository.findById(reservaDto.getBarcoId())
-					.orElseThrow(() -> new BarcoNoEncontradoException("No se ha encontrado ningun barco con este ID: " + reservaDto.getBarcoId()));
-			reserva.setBarco(barco);
+		reserva.setCodigoReserva(codigoReserva);
 
-			ReservaEntity reservaGuardada = reservaRepository.save(reserva);
-			return ReservaMapper.toDTO(reservaGuardada);
+		BarcoEntity barco = barcoRepository.findById(reservaDto.getBarcoId())
+				.orElseThrow(() -> new BarcoNoEncontradoException(
+						"No se ha encontrado ningun barco con este ID: " + reservaDto.getBarcoId()));
+		reserva.setBarco(barco);
+
+		ReservaEntity reservaGuardada = reservaRepository.save(reserva);
+		return ReservaMapper.toDTO(reservaGuardada);
 	}
 
 	@Override
 	public ReservaEntityDTO modificarReserva(Long id, ReservaEntityDTO reservaDto) {
 
-			ReservaEntity reserva = reservaRepository.findById(id)
-					.orElseThrow(() -> new ReservaNoEncontradaException("Reserva no encontrada"));
+		ReservaEntity reserva = reservaRepository.findById(id)
+				.orElseThrow(() -> new ReservaNoEncontradaException("Reserva no encontrada"));
 
-			ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
+		ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
 
-			int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
-					.getPlazasDisponibles();
-			int plazasAñadidas = reservaDto.getNumPersonas() - reserva.getNumPersonas();
-			boolean mismoBarco = reserva.getBarco().getId().equals(reservaDto.getBarcoId());
+		validarBarcoYPlazas(reservaDto, reserva, reservaMod);
 
-			// Se comprueba si el Barco ha cambiado
-			if (!mismoBarco && reservaDto.getNumPersonas() <= plazasDisponibles) {
-				BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId())
-						.orElseThrow(() -> new BarcoNoEncontradoException("Barco no encontrado"));
-				reservaMod.setBarco(barcoMod);
-			} else if (mismoBarco && (plazasAñadidas < 0 || plazasAñadidas <= plazasDisponibles)) {
-				reservaMod.setBarco(reserva.getBarco());
-			} else {
-				throw new PlazasInsuficientesException("El numero de plazas a modificar es superior a las plazas disponibles");
-			}
+		reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
+		reservaRepository.save(reservaMod);
 
-			reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
-			reservaRepository.save(reservaMod);
-			return ReservaMapper.toDTO(reservaMod);
+		return ReservaMapper.toDTO(reservaMod);
 	}
 
 	@Override
@@ -98,37 +95,36 @@ public class ReservaServiceImpl implements ReservaService {
 		reservaRepository.deleteById(id);
 	}
 
-	private String generarCodigoReserva(String nombre, String apellido) {
-		String codigoReserva;
-
-		do {
-			nombre = nombre.trim().toUpperCase();
-			apellido = apellido.trim().toUpperCase();
-
-			String parteNombre = nombre.length() >= 3 ? nombre.substring(0, 3) : nombre;
-			String parteApellido = apellido.length() >= 3 ? apellido.substring(0, 3) : apellido;
-
-			int numero = (int) (Math.random() * 1000);
-			String parteNumero = String.format("%03d", numero);
-
-			codigoReserva = parteNombre + parteApellido + parteNumero;
-		} while (reservaRepository.existsByCodigoReserva(codigoReserva));
-
-		return codigoReserva;
-	}
-
 	@Override
 	public InformacionReservasDTO getInfoReservas(LocalDateTime fechaHora, Long barcoId) {
 
-			BarcoEntity barco = barcoRepository.findById(barcoId)
+		BarcoEntity barco = barcoRepository.findById(barcoId)
+				.orElseThrow(() -> new BarcoNoEncontradoException("Barco no encontrado"));
+
+		int plazasTotales = barco.getCapacidad();
+		int plazasOcupadas = reservaRepository.numeroPlazasReservadas(fechaHora, barcoId);
+		int plazasLibres = plazasTotales - plazasOcupadas;
+
+		InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres);
+		return infoPlazas;
+	}
+
+	public void validarBarcoYPlazas(ReservaEntityDTO reservaDto, ReservaEntity reserva, ReservaEntity reservaMod) {
+
+		int plazasDisponibles = getInfoReservas(reservaDto.getFechaReserva(), reservaDto.getBarcoId())
+				.getPlazasDisponibles();
+		int plazasAñadidas = reservaDto.getNumPersonas() - reserva.getNumPersonas();
+		boolean mismoBarco = reserva.getBarco().getId().equals(reservaDto.getBarcoId());
+
+		if (!mismoBarco && reservaDto.getNumPersonas() <= plazasDisponibles) {
+			BarcoEntity barcoMod = barcoRepository.findById(reservaDto.getBarcoId())
 					.orElseThrow(() -> new BarcoNoEncontradoException("Barco no encontrado"));
-
-			int plazasTotales = barco.getCapacidad();
-			int plazasOcupadas = reservaRepository.numeroPlazasReservadas(fechaHora, barcoId);
-			int plazasLibres = plazasTotales - plazasOcupadas;
-
-			InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres);
-			return infoPlazas;
-
+			reservaMod.setBarco(barcoMod);
+		} else if (mismoBarco && (plazasAñadidas < 0 || plazasAñadidas <= plazasDisponibles)) {
+			reservaMod.setBarco(reserva.getBarco());
+		} else {
+			throw new PlazasInsuficientesException(
+					"El numero de plazas a modificar es superior a las plazas disponibles");
+		}
 	}
 }
