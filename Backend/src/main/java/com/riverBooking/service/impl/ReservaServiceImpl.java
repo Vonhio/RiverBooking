@@ -60,7 +60,8 @@ public class ReservaServiceImpl implements ReservaService {
 
 		String codigoReserva;
 		do {
-			codigoReserva = generadorCodigo.codigoReserva(reservaDto.getNombreCliente(), reservaDto.getApellidoCliente());
+			codigoReserva = generadorCodigo.codigoReserva(reservaDto.getNombreCliente(),
+					reservaDto.getApellidoCliente());
 		} while (reservaRepository.existsByCodigoReserva(codigoReserva));
 
 		reserva.setCodigoReserva(codigoReserva);
@@ -71,7 +72,7 @@ public class ReservaServiceImpl implements ReservaService {
 		reserva.setBarco(barco);
 
 		ReservaEntity reservaGuardada = reservaRepository.save(reserva);
-		mailService.enviarEmail(reservaGuardada);
+		mailService.nuevaReserva(reservaGuardada);
 		return ReservaMapper.toDTO(reservaGuardada);
 	}
 
@@ -86,17 +87,21 @@ public class ReservaServiceImpl implements ReservaService {
 		validarBarcoYPlazas(reservaDto, reserva, reservaMod);
 
 		reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
+
 		reservaRepository.save(reservaMod);
+		mailService.modificacionReserva(reservaMod);
 
 		return ReservaMapper.toDTO(reservaMod);
 	}
 
 	@Override
 	public void eliminarReserva(Long id) {
-		if (!reservaRepository.existsById(id)) {
-			throw new ReservaNoEncontradaException("No existe la reserva seleccionada.");
-		}
+
+		ReservaEntity reservaCancelada = reservaRepository.findById(id)
+				.orElseThrow(() -> new ReservaNoEncontradaException("No existe la reserva seleccionada."));
+
 		reservaRepository.deleteById(id);
+		mailService.cancelacionReserva(reservaCancelada);
 	}
 
 	@Override

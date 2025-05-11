@@ -18,6 +18,7 @@ import com.riverBooking.entity.ReservaEntity;
 import com.riverBooking.entityDTO.ReservaEntityDTO;
 import com.riverBooking.exception.BarcoNoEncontradoException;
 import com.riverBooking.exception.PlazasInsuficientesException;
+import com.riverBooking.exception.ReservaNoEncontradaException;
 import com.riverBooking.repository.BarcoRepository;
 import com.riverBooking.repository.ReservaRepository;
 import com.riverBooking.service.MailService;
@@ -46,7 +47,7 @@ public class ReservaServiceImplTest {
 	}
 
 	@Test
-	void crearReserva_plazasYBarcoDisponibles() {
+	void crearReserva_creacionCorrecta() {
 		// Arrange
 		ReservaEntityDTO dto = new ReservaEntityDTO();
 		dto.setNumPersonas(3);
@@ -83,7 +84,7 @@ public class ReservaServiceImplTest {
 		assertEquals("ABC123", resultado.getCodigoReserva());
 		assertEquals(3, resultado.getNumPersonas());
 		verify(reservaRepository).save(any());
-		verify(mailService).enviarEmail(any());
+		verify(mailService).nuevaReserva(any());
 	}
 
 	@Test
@@ -133,4 +134,135 @@ public class ReservaServiceImplTest {
 		});
 	}
 
+	@Test
+	void eliminarReserva_ReservaNoEncontrada() {
+		// Arrange
+		Long idReserva = 1L;
+
+		// Mocks
+		when(reservaRepository.existsById(idReserva)).thenReturn(false);
+
+		// Act & Assert
+		assertThrows(ReservaNoEncontradaException.class, () -> {
+			reservaServiceImpl.eliminarReserva(idReserva);
+		});
+		verify(reservaRepository, never()).deleteById(idReserva);
+	}
+
+	@Test
+	void eliminarReserva_ReservaEncontrada() {
+		// Arrange
+		Long idReserva = 1L;
+
+		// Mocks
+		when(reservaRepository.existsById(idReserva)).thenReturn(true);
+
+		// Act & Assert
+		reservaServiceImpl.eliminarReserva(idReserva);
+		verify(reservaRepository).deleteById(idReserva);
+	}
+
+	@Test
+	void modificarReserva_modificacionCorrecta() {
+
+		// Arrange
+		Long idReserva = 1L;
+		LocalDateTime fecha = LocalDateTime.now();
+
+		ReservaEntityDTO dto = new ReservaEntityDTO();
+		dto.setNumPersonas(9);
+		dto.setBarcoId(1L);
+		dto.setFechaReserva(fecha);
+
+		BarcoEntity barco = new BarcoEntity();
+		barco.setId(1L);
+		barco.setCapacidad(10);
+
+		ReservaEntity reservaExistente = new ReservaEntity();
+		reservaExistente.setNumPersonas(6);
+		reservaExistente.setBarco(barco);
+		reservaExistente.setFechaReserva(fecha);
+
+		ReservaEntity reservaModificada = new ReservaEntity();
+		reservaModificada.setNumPersonas(9);
+		reservaModificada.setBarco(barco);
+		reservaModificada.setFechaReserva(fecha);
+
+		// Mocks
+		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.of(barco));
+		when(reservaRepository.numeroPlazasReservadas(any(), eq(reservaExistente.getBarco().getId()))).thenReturn(6);
+		when(reservaRepository.save(any())).thenReturn(reservaModificada);
+
+		// Act
+		ReservaEntityDTO resultado = reservaServiceImpl.modificarReserva(idReserva, dto);
+
+		// Asserts
+		assertNotNull(resultado);
+		assertEquals(9, resultado.getNumPersonas());
+		assertEquals(1L, resultado.getBarcoId());
+		verify(reservaRepository).save(any());
+	}
+
+	@Test
+	void modificarReserva_LanzarExcepcionCuandoBarcoNoExiste() {
+
+		// Arrange
+		Long idReserva = 1L;
+
+		ReservaEntityDTO dto = new ReservaEntityDTO();
+		dto.setNumPersonas(9);
+		dto.setBarcoId(1L);
+
+		ReservaEntity reservaExistente = new ReservaEntity();
+		reservaExistente.setNumPersonas(6);
+
+		// Mocks
+		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.empty());
+
+		// Asserts
+		assertThrows(BarcoNoEncontradoException.class, () -> {
+			reservaServiceImpl.modificarReserva(idReserva, dto);
+		});
+		verify(reservaRepository, never()).save(any());
+	}
+
+	@Test
+	void modificarReserva_LanzarExcepcionCuandoPlazasInsuficientes() {
+
+		// Arrange
+		Long idReserva = 1L;
+		LocalDateTime fecha = LocalDateTime.now();
+
+		ReservaEntityDTO dto = new ReservaEntityDTO();
+		dto.setNumPersonas(12);
+		dto.setBarcoId(1L);
+		dto.setFechaReserva(fecha);
+
+		BarcoEntity barco = new BarcoEntity();
+		barco.setId(1L);
+		barco.setCapacidad(10);
+
+		ReservaEntity reservaExistente = new ReservaEntity();
+		reservaExistente.setNumPersonas(6);
+		reservaExistente.setBarco(barco);
+		reservaExistente.setFechaReserva(fecha);
+
+		ReservaEntity reservaModificada = new ReservaEntity();
+		reservaModificada.setNumPersonas(12);
+		reservaModificada.setBarco(barco);
+		reservaModificada.setFechaReserva(fecha);
+
+		// Mocks
+		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.of(barco));
+		when(reservaRepository.numeroPlazasReservadas(any(), eq(reservaExistente.getBarco().getId()))).thenReturn(10);
+
+		// Act & Asserts
+		assertThrows(PlazasInsuficientesException.class, () -> {
+			reservaServiceImpl.modificarReserva(idReserva, dto);
+		});
+		verify(reservaRepository, never()).save(any());
+	}
 }
