@@ -31,7 +31,12 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/auth/login").permitAll()
+						.requestMatchers("/auth/login",
+									  	"/swagger-ui/**",
+							          	"/v3/api-docs/**",
+							          	"/v3/api-docs.yaml",
+							          	"/swagger-ui.html"
+							      		).permitAll()
 						.requestMatchers("/reservas/guardar").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(new JwtAuthFilter(jwtUtil, userDetails), UsernamePasswordAuthenticationFilter.class);

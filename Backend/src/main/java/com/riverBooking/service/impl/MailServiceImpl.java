@@ -21,7 +21,7 @@ public class MailServiceImpl implements MailService {
      SimpleMailMessage mensaje = new SimpleMailMessage();
      mensaje.setTo(reserva.getEmail());
      mensaje.setSubject("Reserva confirmada - River Booking");
-     mensaje.setText("Hola " + reserva.getNombreCliente() + reserva.getApellidoCliente() + ",\n\n" +
+     mensaje.setText("Hola " + reserva.getNombreCliente() + " " + reserva.getApellidoCliente() + ",\n\n" +
 			 "Tu reserva ha sido confirmada.\n" +
 			 "Detalles de la reserva:\n" +
 			 "Fecha y hora: " + reserva.getFechaReserva() + "\n" +
