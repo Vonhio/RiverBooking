@@ -11,9 +11,9 @@ import { Barco } from '../../../interfaces/barco.model';
   selector: 'rb-reserva-form',
   standalone: true,
   imports: [ReactiveFormsModule,
-            HttpClientModule,
-            CommonModule
-            ],
+    HttpClientModule,
+    CommonModule
+  ],
   templateUrl: './reserva-form.component.html',
   styleUrl: './reserva-form.component.scss'
 })
@@ -30,26 +30,25 @@ export class ReservaFormComponent {
   horasBase: string[] = ['10:00', '12:00', '14:00', '16:00', '18:00'];
   listaHoras: string[] = [];
   mostrarSelectorHora: boolean = false;
-  mostrarPlazas: boolean = false;
+  mostrarSelectorPlazas: boolean = false;
 
   plazasArray: number[] = [];
   plazasDisponibles: number = 0;
+  hayPlazas: boolean = false;
 
-  /* ────────── formulario reactivo ────────── */
   formularioReserva = this.fb.group({
-    barcoId:      this.fb.control<number | null>(null, Validators.required),
-    fecha:        this.fb.control('', Validators.required),
-    hora:         this.fb.control('', Validators.required),
-    numPersonas:  this.fb.control<number | null>(null, Validators.required),
-
-    /* datos personales */
-    nombreCliente:     this.fb.control('', Validators.required),
-    apellidoCliente:   this.fb.control('', Validators.required),
-    email:             this.fb.control('', [Validators.required, Validators.email]),
-    telefono:          this.fb.control('', Validators.required)
+    barcoId: this.fb.control<number | null>(null, Validators.required),
+    fecha: this.fb.control('', Validators.required),
+    hora: this.fb.control('', Validators.required),
+    numPersonas: this.fb.control<number | null>(null, Validators.required),
+    nombreCliente: this.fb.control('', Validators.required),
+    apellidoCliente: this.fb.control('', Validators.required),
+    email: this.fb.control('', [Validators.required, Validators.email]),
+    telefono: this.fb.control('', Validators.required),
+    tipoReserva: this.fb.control<'Pública' | 'Privada'>('Pública', Validators.required),
+    precioTotal: this.fb.control<number | null>(null, Validators.required)
   });
 
-  /* ────────── ciclo de vida ────────── */
   ngOnInit() {
     this.barcoService.getBarcos().subscribe((barcos) => {
       this.listaBarcos = barcos;
@@ -57,7 +56,6 @@ export class ReservaFormComponent {
     console.log(this.listaBarcos);
   }
 
-  /* ────────── manejadores de cambios ────────── */
   cambioBarco() {
     this.resetFechaHoraPlazas();
   }
@@ -71,45 +69,49 @@ export class ReservaFormComponent {
   }
 
   cambioHora() {
-  const { barcoId, fecha, hora } = this.formularioReserva.value;
+    const { barcoId, fecha, hora, tipoReserva } = this.formularioReserva.value;
 
-  if (barcoId && fecha && hora) {
-    const fechaHora = `${fecha}T${hora}`;
+    if (barcoId && fecha && hora && tipoReserva) {
+      const fechaHora = `${fecha}T${hora}`;
 
-    this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
-      // 👇 respuesta es un único objeto tipo { plazasDisponibles: 5, ... }
+      this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
-      const plazasDisponibles = respuesta.plazasDisponibles;
+        const plazasDisponibles = respuesta.plazasDisponibles;
 
-      // 👇 Creamos un array de números del 1 al plazasDisponibles
-      this.plazasArray = Array.from({ length: plazasDisponibles }, (_, i) => i + 1);
+        this.plazasArray = Array.from({ length: plazasDisponibles }, (_, i) => i + 1);
 
-      // 👇 Guardamos también el número total, por si lo necesitas
-      this.plazasDisponibles = plazasDisponibles;
+        this.plazasDisponibles = plazasDisponibles;
+        this.mostrarSelectorPlazas = true;
 
-      // 👇 Marcamos que ya hay datos para mostrar el selector
-      this.mostrarPlazas = true;
-
-      // 👇 Valor inicial por defecto en el select si hay mínimo 1 plaza
-      this.formularioReserva.patchValue({
-        numPersonas: plazasDisponibles > 0 ? 1 : null
+        this.formularioReserva.patchValue({
+          numPersonas: plazasDisponibles > 0 ? 1 : null
+        });
       });
-
-      console.log('Plazas disponibles →', plazasDisponibles);
-      console.log('Array generado →', this.plazasArray);
-    });
+    }
   }
-}
 
-  /* ────────── envío ────────── */
+  actualizarPrecio(): void{
+    const plazasReservadas = this.formularioReserva.get('numPersonas')?.value ?? 0;
+    const tipoReserva = this.formularioReserva.get('tipoReserva')?.value;
+
+
+    if(tipoReserva === 'Privada'){
+      const precioTotal = 150.00;
+      this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    } else {
+      const precioTotal = plazasReservadas * 15.00;
+      this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    }
+  }
+
   enviar(): void {
   }
 
-  /* ────────── util ────────── */
   private resetFechaHoraPlazas() {
     this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null });
     this.mostrarSelectorHora = false;
-    this.mostrarPlazas = false;
+    this.mostrarSelectorPlazas = false;
     this.plazasArray = [];
   }
+
 }

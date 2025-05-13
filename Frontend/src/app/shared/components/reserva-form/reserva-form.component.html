@@ -12,6 +12,17 @@
     <div class="invalid-feedback">Debe seleccionar un barco.</div>
   </div>
 
+  <!-- TIPO DE RESERVA -->
+   <div class="mb-3">
+    <label class="form-label" for="tipoReserva">Tipo de reserva</label>
+    <select id="tipoReserva" class="form-select"
+            formControlName="tipoReserva" (change)="cambioTipoReserva()"
+            [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched">
+      <option value="Pública">Pública</option>
+      <option value="Privada">Privada</option>
+    </select>
+   </div>
+
   <!-- FECHA -->
   <div class="mb-3">
     <label class="form-label" for="fecha">Fecha</label>
@@ -35,7 +46,7 @@
   </div>
 
   <!-- PLAZAS -->
-   <ng-container *ngIf="mostrarPlazas">
+   <ng-container *ngIf="mostrarSelectorPlazas">
     <ng-container *ngIf="plazasDisponibles > 0; else sinPlazas">
       <div class="mb-3">
         <label class="form-label" for="plazas">Plazas</label>
@@ -53,6 +64,7 @@
       <p class="text-danger fw-semibold">Sin plazas disponibles en la fecha/hora elegidas.</p>
     </ng-template>
     </ng-container>
+
   <!-- DATOS PERSONALES -->
   <div class="mb-3">
     <label class="form-label" for="nombreCliente">Nombre</label>
@@ -86,6 +98,13 @@
     <div class="invalid-feedback">El teléfono es obligatorio.</div>
   </div>
 
+  <!-- PRECIO TOTAL -->
+   <div class="mb-3">
+    <label class="form-label" for="precioTotal">Precio total</label>
+    <input id="precioTotal" type="number" class="form-control"
+           formControlName="precioTotal" [disabled]="true">
+  </div>
+
   <!-- BOTÓN SUBMIT -->
-  <button type="submit" class="btn btn-primary w-100">Confirmar reserva</button>
+  <button type="submit" class="btn btn-primary w-100" (click)="enviar()">Confirmar reserva</button>
 </form>
