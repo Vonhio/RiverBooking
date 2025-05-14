@@ -3,9 +3,9 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { BarcoService } from '../../../core/services/barco/barco.service';
-import { Plazas } from '../../../interfaces/plazas.model';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Barco } from '../../../interfaces/barco.model';
+import { Reserva } from '../../../interfaces/reserva.model';
 
 @Component({
   selector: 'rb-reserva-form',
@@ -19,21 +19,24 @@ import { Barco } from '../../../interfaces/barco.model';
 })
 export class ReservaFormComponent {
 
-  /* ────────── inyecciones ────────── */
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private barcoService = inject(BarcoService);
   private reservaService = inject(ReservaService);
 
-  /* ────────── datos de apoyo ────────── */
+
   listaBarcos: Barco[] = [];
   horasBase: string[] = ['10:00', '12:00', '14:00', '16:00', '18:00'];
   listaHoras: string[] = [];
-  mostrarSelectorHora: boolean = false;
-  mostrarSelectorPlazas: boolean = false;
-
   plazasArray: number[] = [];
   plazasDisponibles: number = 0;
+  tipoReserva: string[] = ['Compartido'];
+  fechaMinima: string = new Date().toISOString().split('T')[0];
+
+
+
+  mostrarSelectorHora: boolean = false;
+  mostrarSelectorPlazas: boolean = false;
   hayPlazas: boolean = false;
 
   formularioReserva = this.fb.group({
@@ -44,9 +47,9 @@ export class ReservaFormComponent {
     nombreCliente: this.fb.control('', Validators.required),
     apellidoCliente: this.fb.control('', Validators.required),
     email: this.fb.control('', [Validators.required, Validators.email]),
-    telefono: this.fb.control('', Validators.required),
-    tipoReserva: this.fb.control<'Pública' | 'Privada'>('Pública', Validators.required),
-    precioTotal: this.fb.control<number | null>(null, Validators.required)
+    telefono: this.fb.control('', [Validators.required, Validators.pattern(/^\+?[0-9]{9,15}$/)]),
+    tipoReserva: this.fb.control(null, Validators.required),
+    precioTotal: this.fb.control<number | null>({ value: null, disabled: true }, Validators.required)
   });
 
   ngOnInit() {
@@ -56,17 +59,34 @@ export class ReservaFormComponent {
     console.log(this.listaBarcos);
   }
 
+  cambioTipoReserva() {
+
+  }
+
   cambioBarco() {
     this.resetFechaHoraPlazas();
   }
 
   cambioFecha() {
-    if (this.formularioReserva.get('barcoId')?.value) {
-      this.listaHoras = this.horasBase;
-      this.mostrarSelectorHora = true;
-      this.formularioReserva.patchValue({ hora: null, numPersonas: null });
+  const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
+  const hoy = new Date().toISOString().split('T')[0];
+
+  if (fechaSeleccionada) {
+    if (fechaSeleccionada === hoy) {
+      const horaActual = new Date().getHours();
+      this.listaHoras = this.horasBase.filter(hora => {
+        const [h] = hora.split(':');
+        return parseInt(h, 10) > horaActual;
+      });
+    } else {
+      this.listaHoras = [...this.horasBase];
     }
+
+    this.mostrarSelectorHora = true;
+    this.formularioReserva.patchValue({ hora: null, numPersonas: null });
+    this.mostrarSelectorPlazas = false;
   }
+}
 
   cambioHora() {
     const { barcoId, fecha, hora, tipoReserva } = this.formularioReserva.value;
@@ -90,22 +110,66 @@ export class ReservaFormComponent {
     }
   }
 
-  actualizarPrecio(): void{
+  actualizarPrecio(): void {
     const plazasReservadas = this.formularioReserva.get('numPersonas')?.value ?? 0;
-    const tipoReserva = this.formularioReserva.get('tipoReserva')?.value;
 
+    const precioTotal = plazasReservadas * 15.00;
+    this.formularioReserva.patchValue({ precioTotal: precioTotal });
 
-    if(tipoReserva === 'Privada'){
-      const precioTotal = 150.00;
-      this.formularioReserva.patchValue({ precioTotal: precioTotal });
-    } else {
-      const precioTotal = plazasReservadas * 15.00;
-      this.formularioReserva.patchValue({ precioTotal: precioTotal });
-    }
   }
 
   enviar(): void {
+    if (this.formularioReserva.valid) {
+      const {
+        barcoId,
+        fecha,
+        hora,
+        numPersonas,
+        nombreCliente,
+        apellidoCliente,
+        email,
+        telefono,
+        tipoReserva,
+        precioTotal
+      } = this.formularioReserva.getRawValue();
+
+      const fechaHora = `${fecha}T${hora}`;
+      const estado = 'Pendiente';
+
+      const reservaDto: Reserva = {
+        barcoId: barcoId!,
+        fechaReserva: fechaHora!,
+        numPersonas: numPersonas!,
+        nombreCliente: nombreCliente!,
+        apellidoCliente: apellidoCliente!,
+        email: email!,
+        telefono: telefono!,
+        estado: estado!,
+        tipoReserva: tipoReserva!,
+        precioTotal: precioTotal!
+      };
+
+       console.log('🟢 Reserva a enviar:', reservaDto);
+
+      this.reservaService.crearReserva(reservaDto).subscribe({
+        next: () => {
+          alert('Reserva creada correctamente');
+          this.formularioReserva.reset();
+          this.mostrarSelectorPlazas = false;
+          this.mostrarSelectorHora = false;
+          this.listaHoras = [];
+          this.plazasArray = [];
+          this.plazasDisponibles = 0;
+        },
+        error: (error) => {
+          alert('Error al crear la reserva: ' + error.message);
+        }
+      });
+    } else {
+      this.formularioReserva.markAllAsTouched();
+    }
   }
+
 
   private resetFechaHoraPlazas() {
     this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null });
@@ -113,5 +177,4 @@ export class ReservaFormComponent {
     this.mostrarSelectorPlazas = false;
     this.plazasArray = [];
   }
-
 }

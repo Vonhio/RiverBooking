@@ -3,6 +3,7 @@ import { environment } from '../../../../enviroments/enviroment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Plazas } from '../../../interfaces/plazas.model';
+import { Reserva } from '../../../interfaces/reserva.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +23,9 @@ export class ReservaService {
     };
 
     return this.http.get<Plazas>(url, { params });
+  }
+
+  crearReserva(reserva: Reserva): Observable<any>{
+    return this.http.post<Reserva>(`${this.url}/reservas/guardar`, reserva);
   }
 }

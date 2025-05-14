@@ -15,11 +15,10 @@
   <!-- TIPO DE RESERVA -->
    <div class="mb-3">
     <label class="form-label" for="tipoReserva">Tipo de reserva</label>
-    <select id="tipoReserva" class="form-select"
-            formControlName="tipoReserva" (change)="cambioTipoReserva()"
+    <select id="tipoReserva" class="form-select" formControlName="tipoReserva"
             [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched">
-      <option value="Pública">Pública</option>
-      <option value="Privada">Privada</option>
+      <option [ngValue]="null" disabled selected>Seleccione un tipo de reserva</option>
+      <option *ngFor="let tp of tipoReserva" [value]="tp">{{ tp }}</option>
     </select>
    </div>
 
@@ -27,7 +26,8 @@
   <div class="mb-3">
     <label class="form-label" for="fecha">Fecha</label>
     <input id="fecha" type="date" class="form-control"
-           formControlName="fecha" [disabled]="!formularioReserva.get('barcoId')?.value"
+           formControlName="fecha" [min]="fechaMinima"
+           [disabled]="!formularioReserva.get('barcoId')?.value"
            (change)="cambioFecha()"
            [class.is-invalid]="formularioReserva.get('fecha')?.invalid && formularioReserva.get('fecha')?.touched">
     <div class="invalid-feedback">La fecha es obligatoria.</div>
@@ -52,18 +52,19 @@
         <label class="form-label" for="plazas">Plazas</label>
         <select id="plazas"
                 class="form-select"
-                formControlName="numPersonas"
+                formControlName="numPersonas" (change)="actualizarPrecio()"
                 [class.is-invalid]="formularioReserva.get('numPersonas')?.invalid && formularioReserva.get('numPersonas')?.touched">
           <option [ngValue]="null" disabled selected>Seleccione el número de plazas</option>
           <option *ngFor="let p of plazasArray" [value]="p">{{ p }}</option>
         </select>
         <div class="invalid-feedback">Seleccione las plazas.</div>
       </div>
-    </ng-container>
-    <ng-template #sinPlazas>
-      <p class="text-danger fw-semibold">Sin plazas disponibles en la fecha/hora elegidas.</p>
-    </ng-template>
-    </ng-container>
+
+      </ng-container>
+      <ng-template #sinPlazas>
+        <p class="text-danger fw-semibold">Sin plazas disponibles en la fecha/hora elegidas.</p>
+      </ng-template>
+      </ng-container>
 
   <!-- DATOS PERSONALES -->
   <div class="mb-3">
@@ -93,18 +94,19 @@
   <div class="mb-3">
     <label class="form-label" for="telefono">Teléfono</label>
     <input id="telefono" type="tel" class="form-control"
-           formControlName="telefono" placeholder="+34 600 000 000"
-           [class.is-invalid]="formularioReserva.get('telefono')?.invalid && formularioReserva.get('telefono')?.touched">
-    <div class="invalid-feedback">El teléfono es obligatorio.</div>
+       formControlName="telefono" placeholder="+34 600 000 000"
+       [class.is-invalid]="formularioReserva.get('telefono')?.invalid && formularioReserva.get('telefono')?.touched">
+    <div class="invalid-feedback">
+      El teléfono es obligatorio y debe tener entre 9 y 15 dígitos (puede empezar por +).
+    </div>
   </div>
 
   <!-- PRECIO TOTAL -->
    <div class="mb-3">
-    <label class="form-label" for="precioTotal">Precio total</label>
-    <input id="precioTotal" type="number" class="form-control"
-           formControlName="precioTotal" [disabled]="true">
+    <label class="form-label" for="precioTotal">Precio total (€)</label>
+    <input id="precioTotal"  type="text" class="form-control" formControlName="precioTotal" [disabled]="true"/>
   </div>
 
   <!-- BOTÓN SUBMIT -->
-  <button type="submit" class="btn btn-primary w-100" (click)="enviar()">Confirmar reserva</button>
+  <button type="submit" class="btn btn-primary w-100">Confirmar reserva</button>
 </form>
