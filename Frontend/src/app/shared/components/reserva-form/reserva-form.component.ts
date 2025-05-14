@@ -33,8 +33,6 @@ export class ReservaFormComponent {
   tipoReserva: string[] = ['Compartido'];
   fechaMinima: string = new Date().toISOString().split('T')[0];
 
-
-
   mostrarSelectorHora: boolean = false;
   mostrarSelectorPlazas: boolean = false;
   hayPlazas: boolean = false;
@@ -68,25 +66,25 @@ export class ReservaFormComponent {
   }
 
   cambioFecha() {
-  const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
-  const hoy = new Date().toISOString().split('T')[0];
+    const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
+    const hoy = new Date().toISOString().split('T')[0];
 
-  if (fechaSeleccionada) {
-    if (fechaSeleccionada === hoy) {
-      const horaActual = new Date().getHours();
-      this.listaHoras = this.horasBase.filter(hora => {
-        const [h] = hora.split(':');
-        return parseInt(h, 10) > horaActual;
-      });
-    } else {
-      this.listaHoras = [...this.horasBase];
+    if (fechaSeleccionada) {
+      if (fechaSeleccionada === hoy) {
+        const horaActual = new Date().getHours();
+        this.listaHoras = this.horasBase.filter(hora => {
+          const [h] = hora.split(':');
+          return parseInt(h, 10) > horaActual;
+        });
+      } else {
+        this.listaHoras = [...this.horasBase];
+      }
+
+      this.mostrarSelectorHora = true;
+      this.formularioReserva.patchValue({ hora: null, numPersonas: null });
+      this.mostrarSelectorPlazas = false;
     }
-
-    this.mostrarSelectorHora = true;
-    this.formularioReserva.patchValue({ hora: null, numPersonas: null });
-    this.mostrarSelectorPlazas = false;
   }
-}
 
   cambioHora() {
     const { barcoId, fecha, hora, tipoReserva } = this.formularioReserva.value;
@@ -149,8 +147,6 @@ export class ReservaFormComponent {
         precioTotal: precioTotal!
       };
 
-       console.log('🟢 Reserva a enviar:', reservaDto);
-
       this.reservaService.crearReserva(reservaDto).subscribe({
         next: () => {
           alert('Reserva creada correctamente');
@@ -169,7 +165,6 @@ export class ReservaFormComponent {
       this.formularioReserva.markAllAsTouched();
     }
   }
-
 
   private resetFechaHoraPlazas() {
     this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null });

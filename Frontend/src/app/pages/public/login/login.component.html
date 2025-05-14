@@ -1,1 +1,22 @@
-<p>login works!</p>
+<div class="container mt-5">
+  <form [formGroup]="formLogin" (ngSubmit)="login()" class="w-50 mx-auto border p-4 rounded">
+
+    <!-- USUARIO -->
+    <div class="mb-3">
+      <label>Usuario</label>
+      <input class="form-control" type="text" formControlName="username"/>
+      <div **ngIf="form.get('username')?.touched && form.get('username')?.invalid" class="text-danger">Introduzca un usuario</div>
+      </div>
+
+      <!-- CONTRASEÑA -->
+    <div class="mb-3">
+      <label>Contraseña</label>
+      <input class="form-control" type="text" formControlName="password"/>
+      <div **ngIf="form.get('password')?.touched && form.get('password')?.invalid" class="text-danger">Introduzca una contraseña</div>
+    </div>
+
+      <!-- BOTON LOGIN -->
+      <button class="btn btn-primary w-100" type="submit">Ingresar</button>
+
+  </form>
+</div>
