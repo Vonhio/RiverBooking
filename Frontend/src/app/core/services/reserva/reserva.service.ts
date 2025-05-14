@@ -15,7 +15,7 @@ export class ReservaService {
 
   constructor() {}
 
-  getInfoPlazas( fechaHora: string, barcoId: number): Observable<Plazas> {
+  getInfoPlazas(fechaHora: string, barcoId: number): Observable<Plazas> {
     const url = `${this.url}/reservas/plazas`;
     const params = {
       barcoId: barcoId,

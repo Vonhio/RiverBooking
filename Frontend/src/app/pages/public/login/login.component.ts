@@ -16,11 +16,14 @@ export class LoginComponent {
   constructor() {}
 
   formLogin = this.fb.group({
-    username: ['', [Validators.required]],
+    username: ['', Validators.required],
     password: ['', Validators.required]
   });
 
   login(){
+    if(this.formLogin.invalid){
+      this.formLogin.markAllAsTouched();
+    }
     console.log(this.formLogin.value);
   }
 }

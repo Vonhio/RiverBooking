@@ -4,6 +4,7 @@ dist/
 .tmp/
 out-tsc/
 coverage/
+.Angular
 
 # IDEs y editores
 .vscode/
