@@ -1,4 +1,5 @@
 export interface Reserva {
+  id?: number;
   barcoId: number;
   fechaReserva: string;
   numPersonas: number;
@@ -9,4 +10,5 @@ export interface Reserva {
   estado: string;
   tipoReserva: string;
   precioTotal: number;
+  codigoReserva?: string;
 }

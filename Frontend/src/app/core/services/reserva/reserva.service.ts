@@ -28,4 +28,8 @@ export class ReservaService {
   crearReserva(reserva: Reserva): Observable<any>{
     return this.http.post<Reserva>(`${this.url}/reservas/guardar`, reserva);
   }
+
+  getAllReservas(): Observable<Reserva[]>{
+    return this.http.get<Reserva[]>(`${this.url}/reservas`);
+  }
 }
