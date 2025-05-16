@@ -2,6 +2,7 @@ package com.riverBooking.service.impl;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.riverBooking.entity.ReservaEntity;
@@ -16,6 +17,7 @@ public class MailServiceImpl implements MailService {
 		this.mailSender = mailSender;
 	}
 
+	@Async
 	@Override
 	public void nuevaReserva(ReservaEntity reserva) {
      SimpleMailMessage mensaje = new SimpleMailMessage();
@@ -32,7 +34,8 @@ public class MailServiceImpl implements MailService {
      
      mailSender.send(mensaje);
 	}
-
+	
+	@Async
 	@Override
 	public void modificacionReserva(ReservaEntity reserva) {
 		SimpleMailMessage mensaje = new SimpleMailMessage();
@@ -49,7 +52,7 @@ public class MailServiceImpl implements MailService {
 
 	     mailSender.send(mensaje);
 		}
-
+	@Async
 	@Override
 	public void cancelacionReserva(ReservaEntity reserva) {
 		SimpleMailMessage mensaje = new SimpleMailMessage();

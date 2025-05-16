@@ -139,14 +139,12 @@ public class ReservaServiceImplTest {
 		// Arrange
 		Long idReserva = 1L;
 
-		// Mocks
-		when(reservaRepository.existsById(idReserva)).thenReturn(false);
-
 		// Act & Assert
 		assertThrows(ReservaNoEncontradaException.class, () -> {
 			reservaServiceImpl.eliminarReserva(idReserva);
 		});
 		verify(reservaRepository, never()).deleteById(idReserva);
+		verify(mailService, never()).cancelacionReserva(any());
 	}
 
 	@Test
@@ -155,7 +153,7 @@ public class ReservaServiceImplTest {
 		Long idReserva = 1L;
 
 		// Mocks
-		when(reservaRepository.existsById(idReserva)).thenReturn(true);
+		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(new ReservaEntity()));
 
 		// Act & Assert
 		reservaServiceImpl.eliminarReserva(idReserva);
@@ -166,7 +164,6 @@ public class ReservaServiceImplTest {
 	void modificarReserva_modificacionCorrecta() {
 
 		// Arrange
-		Long idReserva = 1L;
 		LocalDateTime fecha = LocalDateTime.now();
 
 		ReservaEntityDTO dto = new ReservaEntityDTO();
@@ -189,13 +186,13 @@ public class ReservaServiceImplTest {
 		reservaModificada.setFechaReserva(fecha);
 
 		// Mocks
-		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(reservaRepository.findById(dto.getId())).thenReturn(Optional.of(reservaExistente));
 		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.of(barco));
 		when(reservaRepository.numeroPlazasReservadas(any(), eq(reservaExistente.getBarco().getId()))).thenReturn(6);
 		when(reservaRepository.save(any())).thenReturn(reservaModificada);
 
 		// Act
-		ReservaEntityDTO resultado = reservaServiceImpl.modificarReserva(idReserva, dto);
+		ReservaEntityDTO resultado = reservaServiceImpl.modificarReserva(dto);
 
 		// Asserts
 		assertNotNull(resultado);
@@ -208,8 +205,6 @@ public class ReservaServiceImplTest {
 	void modificarReserva_LanzarExcepcionCuandoBarcoNoExiste() {
 
 		// Arrange
-		Long idReserva = 1L;
-
 		ReservaEntityDTO dto = new ReservaEntityDTO();
 		dto.setNumPersonas(9);
 		dto.setBarcoId(1L);
@@ -218,12 +213,12 @@ public class ReservaServiceImplTest {
 		reservaExistente.setNumPersonas(6);
 
 		// Mocks
-		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(reservaRepository.findById(dto.getId())).thenReturn(Optional.of(reservaExistente));
 		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.empty());
 
 		// Asserts
 		assertThrows(BarcoNoEncontradoException.class, () -> {
-			reservaServiceImpl.modificarReserva(idReserva, dto);
+			reservaServiceImpl.modificarReserva(dto);
 		});
 		verify(reservaRepository, never()).save(any());
 	}
@@ -232,7 +227,6 @@ public class ReservaServiceImplTest {
 	void modificarReserva_LanzarExcepcionCuandoPlazasInsuficientes() {
 
 		// Arrange
-		Long idReserva = 1L;
 		LocalDateTime fecha = LocalDateTime.now();
 
 		ReservaEntityDTO dto = new ReservaEntityDTO();
@@ -255,13 +249,13 @@ public class ReservaServiceImplTest {
 		reservaModificada.setFechaReserva(fecha);
 
 		// Mocks
-		when(reservaRepository.findById(idReserva)).thenReturn(Optional.of(reservaExistente));
+		when(reservaRepository.findById(dto.getId())).thenReturn(Optional.of(reservaExistente));
 		when(barcoRepository.findById(dto.getBarcoId())).thenReturn(Optional.of(barco));
 		when(reservaRepository.numeroPlazasReservadas(any(), eq(reservaExistente.getBarco().getId()))).thenReturn(10);
 
 		// Act & Asserts
 		assertThrows(PlazasInsuficientesException.class, () -> {
-			reservaServiceImpl.modificarReserva(idReserva, dto);
+			reservaServiceImpl.modificarReserva(dto);
 		});
 		verify(reservaRepository, never()).save(any());
 	}

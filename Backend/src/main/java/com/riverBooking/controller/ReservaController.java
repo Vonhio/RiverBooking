@@ -43,10 +43,9 @@ public class ReservaController {
 
 	}
 
-	@PutMapping("/modificar/{id}")
-	public ResponseEntity<ReservaEntityDTO> modificarReserva(@PathVariable Long id,
-			@RequestBody @Valid ReservaEntityDTO reservaEntityDto) {
-		return ResponseEntity.ok(reservaService.modificarReserva(id, reservaEntityDto));
+	@PutMapping("/modificar")
+	public ResponseEntity<ReservaEntityDTO> modificarReserva(@RequestBody @Valid ReservaEntityDTO reservaEntityDto) {
+		return ResponseEntity.ok(reservaService.modificarReserva(reservaEntityDto));
 	}
 
 	@DeleteMapping("/eliminar/{id}")

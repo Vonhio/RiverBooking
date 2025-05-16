@@ -77,17 +77,16 @@ public class ReservaServiceImpl implements ReservaService {
 	}
 
 	@Override
-	public ReservaEntityDTO modificarReserva(Long id, ReservaEntityDTO reservaDto) {
+	public ReservaEntityDTO modificarReserva(ReservaEntityDTO reservaDto) {
 
-		ReservaEntity reserva = reservaRepository.findById(id)
+		ReservaEntity reserva = reservaRepository.findById(reservaDto.getId())
 				.orElseThrow(() -> new ReservaNoEncontradaException("Reserva no encontrada"));
 
 		ReservaEntity reservaMod = ReservaMapper.toEntity(reservaDto);
 
 		validarBarcoYPlazas(reservaDto, reserva, reservaMod);
 
-		reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
-		reservaMod.setId(id);
+		reservaMod.setCodigoReserva(reserva.getCodigoReserva());
 
 		reservaRepository.save(reservaMod);
 		mailService.modificacionReserva(reservaMod);
