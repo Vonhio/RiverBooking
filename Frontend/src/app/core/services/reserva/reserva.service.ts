@@ -32,4 +32,8 @@ export class ReservaService {
   getAllReservas(): Observable<Reserva[]>{
     return this.http.get<Reserva[]>(`${this.url}/reservas`);
   }
+
+  eliminarReserva(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/reservas/eliminar/${id}`);
+  }
 }

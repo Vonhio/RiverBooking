@@ -1,0 +1,71 @@
+/* ---------- contenedor “card” ---------- */
+.rb-tabla-reservas {
+  max-width: 95vw;
+  margin: 2rem auto;
+  border: 1px solid #ccc;           /* borde gris claro exterior */
+  border-radius: .75rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+}
+
+/* ---------- tabla ---------- */
+.rb-tabla-reservas table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .90rem;
+}
+
+/* cabecera naranja */
+.rb-tabla-reservas thead {
+  background: #ff9d2e;
+  color: #fff;
+}
+.rb-tabla-reservas th {
+  font-weight: 600;
+  padding: .65rem .75rem;
+  border-right: 1px solid #ffa94f;  /* separador vertical tenue */
+}
+.rb-tabla-reservas th:last-child { border-right: none; }
+
+/* filas */
+.rb-tabla-reservas tbody tr {
+  transition: background .15s;
+  border-bottom: 1px solid #eee;    /* línea separadora clara */
+}
+.rb-tabla-reservas tbody tr:nth-child(even) {
+  background: #fff8f0;              /* zebra muy suave */
+}
+.rb-tabla-reservas tbody tr:hover {
+  background: #ffe8cf;
+}
+.rb-tabla-reservas td {
+  padding: .55rem .75rem;
+  vertical-align: middle;
+  border-right: 1px solid #f2f2f2;
+}
+.rb-tabla-reservas td:last-child { border-right: none; }
+
+/* ---------- botones compactos ---------- */
+.rb-tabla-reservas .btn-xs {
+  --bs-btn-padding-y:   .15rem;
+  --bs-btn-padding-x:   .45rem;
+  --bs-btn-font-size:   .75rem;
+  --bs-btn-border-radius: .25rem;
+}
+
+.rb-tabla-reservas .btn-outline-primary {
+  --bs-btn-color:            #ff9d2e;
+  --bs-btn-border-color:     #ff9d2e;
+  --bs-btn-hover-bg:         #ff9d2e;
+  --bs-btn-hover-border-color:#ff9d2e;
+  --bs-btn-hover-color:      #fff;
+}
+
+.rb-tabla-reservas .btn-outline-danger {
+  --bs-btn-color:            #e5503c;
+  --bs-btn-border-color:     #e5503c;
+  --bs-btn-hover-bg:         #e5503c;
+  --bs-btn-hover-border-color:#e5503c;
+  --bs-btn-hover-color:      #fff;
+}
