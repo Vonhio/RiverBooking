@@ -25,7 +25,7 @@ public class ReservaEntityDTO {
 	private String apellidoCliente;
 
 	@NotBlank(message = "El teléfono es obligatorio")
-	@Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "El teléfono debe tener exactamente 9 dígitos")
+	@Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "Introduce un teléfono válido, con o sin prefijo")
 	private String telefono;
 
 	@NotBlank(message = "El email es obligatorio")

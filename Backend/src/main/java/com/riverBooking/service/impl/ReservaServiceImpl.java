@@ -87,6 +87,7 @@ public class ReservaServiceImpl implements ReservaService {
 		validarBarcoYPlazas(reservaDto, reserva, reservaMod);
 
 		reservaMod.setCodigoReserva(reservaDto.getCodigoReserva());
+		reservaMod.setId(id);
 
 		reservaRepository.save(reservaMod);
 		mailService.modificacionReserva(reservaMod);
