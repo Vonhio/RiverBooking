@@ -6,11 +6,12 @@ import { Reserva } from '../../../interfaces/reserva.model';
 import { FormsModule } from '@angular/forms';
 import { ReservaFormComponent } from '../reserva-form/reserva-form.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'rb-reserva-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgxPaginationModule],
   templateUrl: './reserva-list.component.html',
   styleUrl: './reserva-list.component.scss'
 })
@@ -21,6 +22,7 @@ export class ReservaListComponent {
   fechaFiltro: string = '';
   horaFiltro: string = '';
   horasBase: string[] = ['10:00', '12:00', '14:00', '16:00', '18:00'];
+  paginaActual = 1;
 
   modalService = inject(NgbModal);
 
@@ -34,7 +36,7 @@ export class ReservaListComponent {
 
   obtenerReservas(): void {
     this.reservaService.getAllReservas().subscribe((reservas) => {
-      this.reservas = reservas;
+      this.reservas = reservas.reverse();
     });
   }
 

@@ -46,7 +46,7 @@ export class ReservaFormComponent {
     nombreCliente: this.fb.control('', Validators.required),
     apellidoCliente: this.fb.control('', Validators.required),
     email: this.fb.control('', [Validators.required, Validators.email]),
-    telefono: this.fb.control('', [Validators.required, Validators.pattern(/^\+?[0-9]{9,15}$/)]),
+    telefono: this.fb.control('', [Validators.required, Validators.pattern(/^\+?[0-9]{9,12}$/)]),
     tipoReserva: this.fb.control('', Validators.required),
     precioTotal: this.fb.control<number | null>({ value: null, disabled: true }, Validators.required)
   });

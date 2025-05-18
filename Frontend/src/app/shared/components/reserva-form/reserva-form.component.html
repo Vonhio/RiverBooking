@@ -1,114 +1,161 @@
 <div class="rb-modal-wrapper">
-<form [formGroup]="formularioReserva" (ngSubmit)="enviar()">
+  <form [formGroup]="formularioReserva" (ngSubmit)="enviar()">
+    <!-- BARCO -->
+    <div class="form-group">
+      <label class="form-label" for="barco">Tipo de barco</label>
+      <select
+        id="barco"
+        class="form-select"
+        formControlName="barcoId"
+        (change)="cambioBarco()"
+        [class.is-invalid]="formularioReserva.get('barcoId')?.invalid && formularioReserva.get('barcoId')?.touched"
+      >
+        <option [ngValue]="null" disabled selected>Seleccione un barco</option>
+        <option *ngFor="let b of listaBarcos" [value]="b.id">{{ b.nombre }}</option>
+      </select>
+      <div class="error-message">Debe seleccionar un barco.</div>
+    </div>
 
-  <!-- BARCO -->
-  <div class="mb-3">
-    <label class="form-label" for="barco">Tipo de barco</label>
-    <select id="barco" class="form-select"
-            formControlName="barcoId" (change)="cambioBarco()"
-            [class.is-invalid]="formularioReserva.get('barcoId')?.invalid && formularioReserva.get('barcoId')?.touched">
-      <option [ngValue]="null" disabled selected>Seleccione un barco</option>
-      <option *ngFor="let b of listaBarcos" [value]="b.id">{{ b.nombre }}</option>
-    </select>
-    <div class="invalid-feedback">Debe seleccionar un barco.</div>
-  </div>
+    <!-- TIPO DE RESERVA -->
+    <div class="form-group">
+      <label class="form-label" for="tipoReserva">Tipo de reserva</label>
+      <select
+        id="tipoReserva"
+        class="form-select"
+        formControlName="tipoReserva"
+        [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched"
+      >
+        <option [ngValue]="null" disabled selected>Seleccione un tipo de reserva</option>
+        <option *ngFor="let tp of tipoReserva" [value]="tp">{{ tp }}</option>
+      </select>
+      <div class="error-message">Debe seleccionar un tipo de reserva.</div>
+    </div>
 
-  <!-- TIPO DE RESERVA -->
-   <div class="mb-3">
-    <label class="form-label" for="tipoReserva">Tipo de reserva</label>
-    <select id="tipoReserva" class="form-select" formControlName="tipoReserva"
-            [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched">
-      <option [ngValue]="null" disabled selected>Seleccione un tipo de reserva</option>
-      <option *ngFor="let tp of tipoReserva" [value]="tp">{{ tp }}</option>
-    </select>
-   </div>
+    <!-- FECHA -->
+    <div class="form-group">
+      <label class="form-label" for="fecha">Fecha</label>
+      <input
+        id="fecha"
+        type="date"
+        class="form-input"
+        formControlName="fecha"
+        [min]="fechaMinima"
+        [disabled]="!formularioReserva.get('barcoId')?.value"
+        (change)="cambioFecha()"
+        [class.is-invalid]="formularioReserva.get('fecha')?.invalid && formularioReserva.get('fecha')?.touched"
+      >
+      <div class="error-message">La fecha es obligatoria.</div>
+    </div>
 
-  <!-- FECHA -->
-  <div class="mb-3">
-    <label class="form-label" for="fecha">Fecha</label>
-    <input id="fecha" type="date" class="form-control"
-           formControlName="fecha" [min]="fechaMinima"
-           [disabled]="!formularioReserva.get('barcoId')?.value"
-           (change)="cambioFecha()"
-           [class.is-invalid]="formularioReserva.get('fecha')?.invalid && formularioReserva.get('fecha')?.touched">
-    <div class="invalid-feedback">La fecha es obligatoria.</div>
-  </div>
+    <!-- HORA -->
+    <div class="form-group" *ngIf="mostrarSelectorHora">
+      <label class="form-label" for="hora">Hora</label>
+      <select
+        id="hora"
+        class="form-select"
+        formControlName="hora"
+        (change)="cambioHora()"
+        [class.is-invalid]="formularioReserva.get('hora')?.invalid && formularioReserva.get('hora')?.touched"
+      >
+        <option [ngValue]="null" disabled selected>Seleccione una hora</option>
+        <option *ngFor="let h of listaHoras" [value]="h">{{ h }}</option>
+      </select>
+      <div class="error-message">Seleccione una hora.</div>
+    </div>
 
-  <!-- HORA -->
-  <div class="mb-3" *ngIf="mostrarSelectorHora">
-    <label class="form-label" for="hora">Hora</label>
-    <select id="hora" class="form-select"
-            formControlName="hora" (change)="cambioHora()"
-            [class.is-invalid]="formularioReserva.get('hora')?.invalid && formularioReserva.get('hora')?.touched">
-      <option [ngValue]="null" disabled selected>Seleccione una hora</option>
-      <option *ngFor="let h of listaHoras" [value]="h">{{ h }}</option>
-    </select>
-    <div class="invalid-feedback">Seleccione una hora.</div>
-  </div>
-
-  <!-- PLAZAS -->
-   <ng-container *ngIf="mostrarSelectorPlazas">
-    <ng-container *ngIf="plazasDisponibles > 0; else sinPlazas">
-      <div class="mb-3">
-        <label class="form-label" for="plazas">Plazas</label>
-        <select id="plazas"
-                class="form-select"
-                formControlName="numPersonas" (change)="actualizarPrecio()"
-                [class.is-invalid]="formularioReserva.get('numPersonas')?.invalid && formularioReserva.get('numPersonas')?.touched">
-          <option [ngValue]="null" disabled selected>Seleccione el número de plazas</option>
-          <option *ngFor="let p of plazasArray" [value]="p">{{ p }}</option>
-        </select>
-        <div class="invalid-feedback">Seleccione las plazas.</div>
-      </div>
-
+    <!-- PLAZAS -->
+    <ng-container *ngIf="mostrarSelectorPlazas">
+      <ng-container *ngIf="plazasDisponibles > 0; else sinPlazas">
+        <div class="form-group">
+          <label class="form-label" for="plazas">Plazas</label>
+          <select
+            id="plazas"
+            class="form-select"
+            formControlName="numPersonas"
+            (change)="actualizarPrecio()"
+            [class.is-invalid]="formularioReserva.get('numPersonas')?.invalid && formularioReserva.get('numPersonas')?.touched"
+          >
+            <option [ngValue]="null" disabled selected>Seleccione el número de plazas</option>
+            <option *ngFor="let p of plazasArray" [value]="p">{{ p }}</option>
+          </select>
+          <div class="error-message">Seleccione las plazas.</div>
+        </div>
       </ng-container>
       <ng-template #sinPlazas>
-        <p class="text-danger fw-semibold">Sin plazas disponibles en la fecha/hora elegidas.</p>
+        <p class="error-notice">Sin plazas disponibles en la fecha/hora elegidas.</p>
       </ng-template>
-      </ng-container>
+    </ng-container>
 
-  <!-- DATOS PERSONALES -->
-  <div class="mb-3">
-    <label class="form-label" for="nombreCliente">Nombre</label>
-    <input id="nombreCliente" type="text" class="form-control"
-           formControlName="nombreCliente" placeholder="Introduzca su nombre"
-           [class.is-invalid]="formularioReserva.get('nombreCliente')?.invalid && formularioReserva.get('nombreCliente')?.touched">
-    <div class="invalid-feedback">El nombre es obligatorio.</div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label" for="apellidoCliente">Apellidos</label>
-    <input id="apellidoCliente" type="text" class="form-control"
-           formControlName="apellidoCliente" placeholder="Introduzca sus apellidos"
-           [class.is-invalid]="formularioReserva.get('apellidoCliente')?.invalid && formularioReserva.get('apellidoCliente')?.touched">
-    <div class="invalid-feedback">Los apellidos son obligatorios.</div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label" for="email">Email</label>
-    <input id="email" type="email" class="form-control"
-           formControlName="email" placeholder="email@example.com"
-           [class.is-invalid]="formularioReserva.get('email')?.invalid && formularioReserva.get('email')?.touched">
-    <div class="invalid-feedback">Email no válido.</div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label" for="telefono">Teléfono</label>
-    <input id="telefono" type="tel" class="form-control"
-       formControlName="telefono" placeholder="+34 600 000 000"
-       [class.is-invalid]="formularioReserva.get('telefono')?.invalid && formularioReserva.get('telefono')?.touched">
-    <div class="invalid-feedback">
-      El teléfono es obligatorio y debe tener entre 9 y 15 dígitos (puede empezar por +).
+    <!-- DATOS PERSONALES -->
+    <div class="form-group">
+      <label class="form-label" for="nombreCliente">Nombre</label>
+      <input
+        id="nombreCliente"
+        type="text"
+        class="form-input"
+        formControlName="nombreCliente"
+        placeholder="Introduzca su nombre"
+        [class.is-invalid]="formularioReserva.get('nombreCliente')?.invalid && formularioReserva.get('nombreCliente')?.touched"
+      >
+      <div class="error-message">El nombre es obligatorio.</div>
     </div>
-  </div>
 
-  <!-- PRECIO TOTAL -->
-   <div class="mb-3">
-    <label class="form-label" for="precioTotal">Precio total (€)</label>
-    <input id="precioTotal"  type="text" class="form-control" formControlName="precioTotal" [disabled]="true"/>
-  </div>
+    <div class="form-group">
+      <label class="form-label" for="apellidoCliente">Apellidos</label>
+      <input
+        id="apellidoCliente"
+        type="text"
+        class="form-input"
+        formControlName="apellidoCliente"
+        placeholder="Introduzca sus apellidos"
+        [class.is-invalid]="formularioReserva.get('apellidoCliente')?.invalid && formularioReserva.get('apellidoCliente')?.touched"
+      >
+      <div class="error-message">Los apellidos son obligatorios.</div>
+    </div>
 
-  <!-- BOTÓN SUBMIT -->
-  <button type="submit" class="btn-send">Confirmar reserva</button>
-</form>
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        class="form-input"
+        formControlName="email"
+        placeholder="email@example.com"
+        [class.is-invalid]="formularioReserva.get('email')?.invalid && formularioReserva.get('email')?.touched"
+      >
+      <div class="error-message">Email no válido.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="telefono">Teléfono</label>
+      <input
+        id="telefono"
+        type="tel"
+        class="form-input"
+        formControlName="telefono"
+        placeholder="+34666555444"
+        [class.is-invalid]="formularioReserva.get('telefono')?.invalid && formularioReserva.get('telefono')?.touched"
+      >
+      <div class="error-message">
+        El teléfono es obligatorio y debe tener el prefijo y los 9 números del teléfono.
+      </div>
+    </div>
+
+    <!-- PRECIO TOTAL -->
+    <div class="form-group">
+      <label class="form-label" for="precioTotal">Precio total (€)</label>
+      <input
+        id="precioTotal"
+        type="text"
+        class="form-input"
+        formControlName="precioTotal"
+        [disabled]="true"
+      />
+    </div>
+
+    <!-- BOTÓN SUBMIT -->
+    <div class="form-actions">
+      <button type="submit" class="btn-send">Confirmar reserva</button>
+    </div>
+  </form>
 </div>

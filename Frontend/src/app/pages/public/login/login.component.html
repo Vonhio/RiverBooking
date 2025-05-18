@@ -1,22 +1,68 @@
-<div class="container mt-5">
-  <form [formGroup]="formLogin" (ngSubmit)="login()" class="w-50 mx-auto border p-4 rounded">
-
-    <!-- USUARIO -->
-    <div class="mb-3">
-      <label>Usuario</label>
-      <input class="form-control" type="text" formControlName="username"/>
-      <div *ngIf="formLogin.get('username')?.touched && formLogin.get('username')?.invalid" class="text-danger">Introduzca un usuario</div>
+<html>
+<div class="login-container">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">
+          <i class="fas fa-ship"></i>
+        </div>
+        <h2 class="login-title">Admin Portal</h2>
+        <p class="login-subtitle">Gestión de Reservas de Barcos</p>
       </div>
 
-      <!-- CONTRASEÑA -->
-    <div class="mb-3">
-      <label>Contraseña</label>
-      <input class="form-control" type="password" formControlName="password"/>
-      <div *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.invalid" class="text-danger">Introduzca una contraseña</div>
+      <form [formGroup]="formLogin" (ngSubmit)="login()">
+
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <i class="fas fa-user"></i>
+            </span>
+            <input
+              class="form-input"
+              type="text"
+              formControlName="username"
+              placeholder="Ingrese su nombre de usuario"
+            />
+          </div>
+          <div
+            *ngIf="formLogin.get('username')?.touched && formLogin.get('username')?.invalid"
+            class="error-message">
+            Introduzca un usuario
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <i class="fas fa-lock"></i>
+            </span>
+            <input
+              class="form-input"
+              type="password"
+              formControlName="password"
+              placeholder="Ingrese su contraseña"
+            />
+          </div>
+          <div
+            *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.invalid"
+            class="error-message">
+            Introduzca una contraseña
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button class="login-button" type="submit">
+            Ingresar <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+
+      <div class="login-footer">
+        <p>© 2025 Sistema de Reservas</p>
+      </div>
     </div>
-
-      <!-- BOTON LOGIN -->
-      <button class="btn btn-primary w-100" type="submit">Ingresar</button>
-
-  </form>
+  </div>
 </div>
+</html>

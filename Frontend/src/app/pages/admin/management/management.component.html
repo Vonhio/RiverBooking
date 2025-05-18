@@ -1,5 +1,18 @@
-<rb-reserva-list></rb-reserva-list>
-<div class="text-right text-center p-3">
-  <button type="button" class="btn btn-outline-danger btn-lg" (click)="logout()">Cerrar sesión</button>
-</div>
+<div class="management-page">
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="fas fa-ship"></i>
+        <h1>Gestión de Reservas</h1>
+      </div>
+      <button class="logout-button" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar sesión
+      </button>
+    </div>
+  </header>
 
+  <main class="page-content">
+    <rb-reserva-list></rb-reserva-list>
+  </main>
+</div>

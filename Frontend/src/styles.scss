@@ -1,14 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* Importing Bootstrap SCSS file. */
-@use 'bootstrap/scss/bootstrap';
-@import 'ag-grid-community/styles/ag-theme-alpine.css';
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
-* {
+html {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    background-color: rgb(213, 240, 255);
   }
 
 

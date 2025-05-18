@@ -1,42 +1,39 @@
-<div class="table-responsive-sm">
-  <div class="rb-tabla-reservas">
-
-    <!-- Filtros -->
-    <div class="d-flex flex-wrap gap-3 mb-3 align-items-center">
-
-      <!-- Campo de búsqueda -->
-      <div class="input-group w-auto">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
+<div class="table-container">
+  <div class="reservas-tabla">
+    <div class="filtros-wrapper">
+      <div class="input-wrapper">
+        <span class="input-icon">
+          <i class="fas fa-search"></i>
+        </span>
         <input
           type="text"
-          class="form-control form-control-sm"
+          class="form-input"
           placeholder="Buscar por código o cliente…"
           aria-label="Buscar por código o cliente"
           [(ngModel)]="terminoBusqueda"
-          style="min-width: 200px"
         />
       </div>
 
-      <!-- Campo de fecha -->
-      <div class="input-group w-auto">
-        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+      <div class="input-wrapper">
+        <span class="input-icon">
+          <i class="fas fa-calendar"></i>
+        </span>
         <input
           type="date"
-          class="form-control form-control-sm"
+          class="form-input"
           aria-label="Filtrar por fecha"
           [(ngModel)]="fechaFiltro"
-          style="min-width: 150px"
         />
       </div>
 
-      <!-- Selector de hora -->
-      <div class="input-group w-auto">
-        <label class="input-group-text"><i class="bi bi-clock"></i></label>
+      <div class="input-wrapper">
+        <span class="input-icon">
+          <i class="fas fa-clock"></i>
+        </span>
         <select
-          class="form-select form-select-sm"
+          class="form-select"
           aria-label="Filtrar por hora"
           [(ngModel)]="horaFiltro"
-          style="min-width: 140px"
         >
           <option value="">— Todas las horas —</option>
           <option *ngFor="let hora of horasBase" [value]="hora">{{ hora }}</option>
@@ -44,53 +41,56 @@
       </div>
     </div>
 
-    <!-- Tabla de reservas -->
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Tipo</th>
-          <th>Personas</th>
-          <th>Cliente</th>
-          <th>Teléfono</th>
-          <th>Email</th>
-          <th>Estado</th>
-          <th>Barco</th>
-          <th>Código</th>
-          <th>Precio</th>
-          <th class="text-start">Acciones</th>
-        </tr>
-      </thead>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Personas</th>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Barco</th>
+            <th>Código</th>
+            <th>Precio</th>
+            <th class="actions-column">Acciones</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr *ngFor="let r of reservasFiltradas()">
-          <td>{{ r.fechaReserva | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ r.tipoReserva }}</td>
-          <td>{{ r.numPersonas }}</td>
-          <td>{{ r.nombreCliente }} {{ r.apellidoCliente }}</td>
-          <td>{{ r.telefono }}</td>
-          <td>{{ r.email }}</td>
-          <td>{{ r.estado }}</td>
-          <td>{{ r.barcoId }}</td>
-          <td>{{ r.codigoReserva }}</td>
-          <td>{{ r.precioTotal }} €</td>
-          <td class="text-start">
-            <button
-              type="button"
-              class="btn btn-sm btn-primary me-2"
-              (click)="modificarReserva(r)">
-              Modificar
-            </button>
-            <button
-              type="button"
-              class="btn btn-sm btn-danger"
-              (click)="eliminarReserva(r.id!)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
+        <tbody>
+          <tr *ngFor="let r of reservasFiltradas() | paginate: { itemsPerPage: 10, currentPage: paginaActual }">
+            <td>{{ r.fechaReserva | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ r.tipoReserva }}</td>
+            <td>{{ r.numPersonas }}</td>
+            <td>{{ r.nombreCliente }} {{ r.apellidoCliente }}</td>
+            <td>{{ r.telefono }}</td>
+            <td>{{ r.email }}</td>
+            <td>{{ r.estado }}</td>
+            <td>{{ r.barcoId }}</td>
+            <td>{{ r.codigoReserva }}</td>
+            <td>{{ r.precioTotal }} €</td>
+            <td class="actions-column">
+              <div class="action-buttons">
+                <button
+                  type="button"
+                  class="btn-modify"
+                  (click)="modificarReserva(r)">
+                  Modificar
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete"
+                  (click)="eliminarReserva(r.id!)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+                      <pagination-controls (pageChange)="paginaActual = $event"></pagination-controls>
+      </table>
+    </div>
   </div>
 </div>
