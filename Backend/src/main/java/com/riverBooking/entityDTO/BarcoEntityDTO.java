@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-public class BarcoDTO {
+public class BarcoEntityDTO {
 
 	private Long id;
 	
@@ -18,7 +18,7 @@ public class BarcoDTO {
 	@NotBlank
 	private String descripcion;
 
-	public BarcoDTO(Long id, @NotBlank(message = "El nombre del barco no puede estar vacío") String nombre,
+	public BarcoEntityDTO(Long id, @NotBlank(message = "El nombre del barco no puede estar vacío") String nombre,
 			@Min(value = 1, message = "Debe haber al menos una plaza") @Max(value = 14, message = "El barco no puede superar las 14 plazas") int capacidad,
 			@NotBlank String descripcion) {
 		this.id = id;
@@ -27,7 +27,7 @@ public class BarcoDTO {
 		this.descripcion = descripcion;
 	}
 
-	public BarcoDTO() {
+	public BarcoEntityDTO() {
 	}
 
 	public String getNombre() {

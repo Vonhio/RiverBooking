@@ -16,7 +16,7 @@ public class BarcoEntity {
     @Column(name = "capacidad", nullable = false)
     private int capacidad;
 
-    @Column(name = "descripcion", nullable = true, length = 120)
+    @Column(name = "descripcion", nullable = true, length = 255)
     private String descripcion;
 
     public BarcoEntity() {

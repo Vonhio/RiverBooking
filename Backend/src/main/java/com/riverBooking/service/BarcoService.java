@@ -2,8 +2,8 @@ package com.riverBooking.service;
 
 import java.util.List;
 
-import com.riverBooking.entityDTO.BarcoDTO;
+import com.riverBooking.entityDTO.BarcoEntityDTO;
 
 public interface BarcoService {
-	List<BarcoDTO> getAllBarcos();
+	List<BarcoEntityDTO> getAllBarcos();
 }
