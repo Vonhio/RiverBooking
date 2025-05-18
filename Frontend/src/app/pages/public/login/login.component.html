@@ -11,7 +11,7 @@
       <!-- CONTRASEÑA -->
     <div class="mb-3">
       <label>Contraseña</label>
-      <input class="form-control" type="text" formControlName="password"/>
+      <input class="form-control" type="password" formControlName="password"/>
       <div *ngIf="formLogin.get('password')?.touched && formLogin.get('password')?.invalid" class="text-danger">Introduzca una contraseña</div>
     </div>
 

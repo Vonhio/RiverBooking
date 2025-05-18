@@ -1,3 +1,74 @@
-<div class="text-center mt-5">
-  <button class="btn btn-primary btn-lg " (click)="abrirModalReserva()">Haz tu reserva aquí</button>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riverbooking - Vive la experiencia de navegar</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Riverbooking</h1>
+        </div>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>+32 66 789 0123</span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>info&#64;riverbooking.com</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>¡Disfruta de la ciudad de Sevilla desde otra perspectiva!</h2>
+            <p>Reserva ahora tu paseo en barco y vive una experiencia unica.</p>
+            <button class="reservation-btn" (click)="abrirModalReserva()">Haz tu reserva</button>
+        </div>
+    </section>
+
+    <section class="boats-section">
+        <h2>Nuestra flota</h2>
+        <div class="boat-cards">
+            <div class="boat-card">
+                <div class="boat-image">
+                    <img src="assets/img/infinito-boat.png" alt="Infinito">
+                </div>
+                <div class="boat-info">
+                    <h3>Infinito</h3>
+                    <p class="boat-description">Trimarán espacioso con bañera amplia, asientos laterales, mesas desmontables, nevera y baño. Ideal para relajarse con buena música gracias a su equipo de sonido con altavoces.</p>
+                    <ul class="boat-features">
+                        <li><i class="fas fa-users"></i> Capacidad: 14 personas</li>
+                        <li><i class="fa fa-bath"></i> Baño propio</li>
+                        <li><i class="fa fa-cutlery"></i> Servicio de bebidas disponibles</li>
+                    </ul>
+                    <p class="boat-price">Desde 15€ / persona</p>
+                </div>
+            </div>
+
+            <div class="boat-card">
+                <div class="boat-image">
+                    <img src="assets\img\Merimar-boat.jpg" alt="Merimar">
+                </div>
+                <div class="boat-info">
+                    <h3>Merimar</h3>
+                    <p class="boat-description">Yate cómodo y con estilo, perfecto para navegar y hacer fotos en su gran proa. Cuenta con asiento en bañera, nevera, baño y sistema de sonido para ambientar cada momento.</p>
+                    <ul class="boat-features">
+                        <li><i class="fas fa-users"></i> Capacidad: 14 personas</li>
+                        <li><i class="fa fa-bath"></i> Baño propio</li>
+                        <li><i class="fa fa-cutlery"></i> Servicio de bebidas disponibles</li>
+                    </ul>
+                    <p class="boat-price">Desde 15€ / persona</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Riverbooking. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

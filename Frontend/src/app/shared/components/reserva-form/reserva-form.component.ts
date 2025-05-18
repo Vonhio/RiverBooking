@@ -1,11 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { BarcoService } from '../../../core/services/barco/barco.service';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Barco } from '../../../interfaces/barco.model';
 import { Reserva } from '../../../interfaces/reserva.model';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'rb-reserva-form',
@@ -20,11 +21,11 @@ import { Reserva } from '../../../interfaces/reserva.model';
 export class ReservaFormComponent {
 
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
   private barcoService = inject(BarcoService);
   private reservaService = inject(ReservaService);
+  private modalReserva = inject(NgbActiveModal);
 
-
+  @Input() reservaEditar: Reserva | null = null;
   listaBarcos: Barco[] = [];
   horasBase: string[] = ['10:00', '12:00', '14:00', '16:00', '18:00'];
   listaHoras: string[] = [];
@@ -46,7 +47,7 @@ export class ReservaFormComponent {
     apellidoCliente: this.fb.control('', Validators.required),
     email: this.fb.control('', [Validators.required, Validators.email]),
     telefono: this.fb.control('', [Validators.required, Validators.pattern(/^\+?[0-9]{9,15}$/)]),
-    tipoReserva: this.fb.control(null, Validators.required),
+    tipoReserva: this.fb.control('', Validators.required),
     precioTotal: this.fb.control<number | null>({ value: null, disabled: true }, Validators.required)
   });
 
@@ -54,15 +55,39 @@ export class ReservaFormComponent {
     this.barcoService.getBarcos().subscribe((barcos) => {
       this.listaBarcos = barcos;
     });
-    console.log(this.listaBarcos);
-  }
 
+
+    if (this.reservaEditar) {
+      this.mostrarSelectorHora = true
+      this.mostrarSelectorPlazas = true;
+
+      const [fecha, hora] = this.reservaEditar.fechaReserva.split('T');
+
+      this.formularioReserva.patchValue({
+        barcoId: this.reservaEditar.barcoId,
+        fecha: fecha,
+        hora: hora,
+        numPersonas: this.reservaEditar.numPersonas,
+        nombreCliente: this.reservaEditar.nombreCliente,
+        apellidoCliente: this.reservaEditar.apellidoCliente,
+        email: this.reservaEditar.email,
+        telefono: this.reservaEditar.telefono,
+        tipoReserva: this.reservaEditar.tipoReserva,
+        precioTotal: this.reservaEditar.precioTotal
+      });
+
+      this.cambioFecha();
+      setTimeout(this.cambioFecha, 1000);
+    }
+  }
+  // Método para implementación de nuevas reservas. Aun no existen tales reservas, solo compartida.
   cambioTipoReserva() {
 
   }
 
   cambioBarco() {
     this.resetFechaHoraPlazas();
+
   }
 
   cambioFecha() {
@@ -94,15 +119,25 @@ export class ReservaFormComponent {
 
       this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
-        const plazasDisponibles = respuesta.plazasDisponibles;
+        let plazasLibres: number;
+        const barcoCambiado = barcoId === this.reservaEditar?.barcoId;
 
-        this.plazasArray = Array.from({ length: plazasDisponibles }, (_, i) => i + 1);
+        if (this.reservaEditar?.id && this.reservaEditar.numPersonas && barcoCambiado) {
+          plazasLibres = respuesta.plazasDisponibles + this.reservaEditar.numPersonas;
 
-        this.plazasDisponibles = plazasDisponibles;
+          this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
+
+        } else {
+          plazasLibres = respuesta.plazasDisponibles;
+
+          this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
+        }
+
+        this.plazasDisponibles = plazasLibres;
         this.mostrarSelectorPlazas = true;
 
         this.formularioReserva.patchValue({
-          numPersonas: plazasDisponibles > 0 ? 1 : null
+          numPersonas: plazasLibres > 0 ? 1 : null
         });
       });
     }
@@ -147,20 +182,36 @@ export class ReservaFormComponent {
         precioTotal: precioTotal!
       };
 
-      this.reservaService.crearReserva(reservaDto).subscribe({
-        next: () => {
-          alert('Reserva creada correctamente');
-          this.formularioReserva.reset();
-          this.mostrarSelectorPlazas = false;
-          this.mostrarSelectorHora = false;
-          this.listaHoras = [];
-          this.plazasArray = [];
-          this.plazasDisponibles = 0;
-        },
-        error: (error) => {
-          alert('Error al crear la reserva: ' + error.message);
-        }
-      });
+      if (this.reservaEditar?.id) {
+        reservaDto.id = this.reservaEditar.id;
+        reservaDto.codigoReserva = this.reservaEditar.codigoReserva;
+
+        this.reservaService.modificarReserva(reservaDto).subscribe({
+          next: () => {
+            alert('Reserva modificada correctamente');
+            this.barcoService.getBarcos();
+            this.modalReserva.close();
+          },
+          error: (error) => {
+            alert('Error al modificar la reserva: ' + error.message);
+          }
+        })
+      } else {
+        this.reservaService.crearReserva(reservaDto).subscribe({
+          next: () => {
+            alert('Reserva creada correctamente');
+            this.formularioReserva.reset();
+            this.mostrarSelectorPlazas = false;
+            this.mostrarSelectorHora = false;
+            this.listaHoras = [];
+            this.plazasArray = [];
+            this.plazasDisponibles = 0;
+          },
+          error: (error) => {
+            alert('Error al crear la reserva: ' + error.message);
+          }
+        });
+      }
     } else {
       this.formularioReserva.markAllAsTouched();
     }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ReservaFormComponent } from '../../../shared/components/reserva-form/reserva-form.component';
 
@@ -10,9 +10,11 @@ import { ReservaFormComponent } from '../../../shared/components/reserva-form/re
 })
 export class HomeComponent {
 
-  constructor(private modalService: NgbModal) {}
+  modalService = inject(NgbModal);
+
+  constructor() {}
 
   abrirModalReserva() {
-    this.modalService.open(ReservaFormComponent, {size: 'lg'});
+    this.modalService.open(ReservaFormComponent, {size: 'md'});
   }
 }

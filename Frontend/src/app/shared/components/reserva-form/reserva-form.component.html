@@ -1,3 +1,4 @@
+<div class="rb-modal-wrapper">
 <form [formGroup]="formularioReserva" (ngSubmit)="enviar()">
 
   <!-- BARCO -->
@@ -7,7 +8,7 @@
             formControlName="barcoId" (change)="cambioBarco()"
             [class.is-invalid]="formularioReserva.get('barcoId')?.invalid && formularioReserva.get('barcoId')?.touched">
       <option [ngValue]="null" disabled selected>Seleccione un barco</option>
-      <option *ngFor="let b of listaBarcos" [value]="b.id">{{ b.nombre }} – Cap: {{ b.descripcion }}</option>
+      <option *ngFor="let b of listaBarcos" [value]="b.id">{{ b.nombre }}</option>
     </select>
     <div class="invalid-feedback">Debe seleccionar un barco.</div>
   </div>
@@ -108,5 +109,6 @@
   </div>
 
   <!-- BOTÓN SUBMIT -->
-  <button type="submit" class="btn btn-primary w-100">Confirmar reserva</button>
+  <button type="submit" class="btn-send">Confirmar reserva</button>
 </form>
+</div>

@@ -25,12 +25,16 @@ export class ReservaService {
     return this.http.get<Plazas>(url, { params });
   }
 
-  crearReserva(reserva: Reserva): Observable<any>{
+  crearReserva(reserva: Reserva): Observable<Reserva>{
     return this.http.post<Reserva>(`${this.url}/reservas/guardar`, reserva);
   }
 
   getAllReservas(): Observable<Reserva[]>{
     return this.http.get<Reserva[]>(`${this.url}/reservas`);
+  }
+
+  modificarReserva(reserva: Reserva): Observable<Reserva> {
+    return this.http.put<Reserva>(`${this.url}/reservas/modificar`, reserva);
   }
 
   eliminarReserva(id: number): Observable<void> {

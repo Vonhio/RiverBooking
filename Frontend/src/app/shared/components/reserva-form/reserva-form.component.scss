@@ -1,0 +1,67 @@
+/* Contenedor general (modal o tarjeta) */
+.rb-modal-wrapper {
+  background-color: #f7f8fd;
+  padding: 2rem;
+  margin: auto;
+  max-width: 99%;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Espaciado entre campos del formulario */
+.rb-modal-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Inputs y selects */
+.rb-modal-wrapper .form-control,
+.rb-modal-wrapper .form-select {
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #437bf5;
+  transition: border-color 0.2s ease;
+}
+
+/* Focus naranjita */
+.rb-modal-wrapper .form-control:focus,
+.rb-modal-wrapper .form-select:focus {
+  border-color: #0099ff;
+  box-shadow: 0 0 0 0.15rem rgba(255, 122, 0, 0.25);
+}
+
+/* Etiquetas */
+.rb-modal-wrapper label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* Errores */
+.rb-modal-wrapper .is-invalid {
+  border-color: #cc5200;
+}
+
+.rb-modal-wrapper .invalid-feedback {
+  color: #cc5200;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Botón naranja */
+.rb-modal-wrapper .btn-send {
+  background-color: #0077ff;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  align-self: center;
+  transition: background-color 0.2s ease;
+  width: fit-content;
+}
+
+.rb-modal-wrapper .btn-orange:hover {
+  background-color: #cc5200;
+}

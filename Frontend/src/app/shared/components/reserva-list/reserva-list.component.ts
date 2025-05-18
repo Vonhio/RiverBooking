@@ -4,6 +4,8 @@ import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { CommonModule } from '@angular/common';
 import { Reserva } from '../../../interfaces/reserva.model';
 import { FormsModule } from '@angular/forms';
+import { ReservaFormComponent } from '../reserva-form/reserva-form.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'rb-reserva-list',
@@ -15,6 +17,12 @@ import { FormsModule } from '@angular/forms';
 export class ReservaListComponent {
 
   reservas: Reserva[] = [];
+  terminoBusqueda: string = '';
+  fechaFiltro: string = '';
+  horaFiltro: string = '';
+  horasBase: string[] = ['10:00', '12:00', '14:00', '16:00', '18:00'];
+
+  modalService = inject(NgbModal);
 
   private reservaService = inject(ReservaService)
 
@@ -37,6 +45,7 @@ export class ReservaListComponent {
     this.reservaService.eliminarReserva(id).subscribe({
       next: () => {
         this.obtenerReservas();
+        this.reservasFiltradas();
         alert('Reserva eliminada correctamente')
       },
       error: (err) => {
@@ -44,4 +53,36 @@ export class ReservaListComponent {
       }
     });
   }
+
+  modificarReserva(reserva: Reserva): void {
+    const modalReservas = this.modalService.open(ReservaFormComponent, { size: 'lg' });
+    modalReservas.componentInstance.reservaEditar = reserva;
+    modalReservas.closed.subscribe({
+      next: () => {
+        this.obtenerReservas();
+        this.reservasFiltradas();
+      },
+      error: () => {
+        alert('No se pudo modificar la reserva')
+      }
+    });
+  }
+
+  reservasFiltradas(): Reserva[] {
+  const termino = this.terminoBusqueda.toLowerCase();
+
+  return this.reservas.filter(r => {
+    const coincideTexto =
+      r.codigoReserva?.toLowerCase().includes(termino) ||
+      `${r.nombreCliente} ${r.apellidoCliente}`.toLowerCase().includes(termino);
+
+    const coincideFecha =
+      !this.fechaFiltro || r.fechaReserva.startsWith(this.fechaFiltro);
+
+    const coincideHora =
+      !this.horaFiltro || r.fechaReserva.includes(this.horaFiltro);
+
+    return coincideTexto && coincideFecha && coincideHora;
+  });
+}
 }
