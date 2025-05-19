@@ -7,6 +7,7 @@ import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Barco } from '../../../interfaces/barco.model';
 import { Reserva } from '../../../interfaces/reserva.model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'rb-reserva-form',
@@ -188,18 +189,54 @@ export class ReservaFormComponent {
 
         this.reservaService.modificarReserva(reservaDto).subscribe({
           next: () => {
-            alert('Reserva modificada correctamente');
+            Swal.fire({
+              icon: 'success',
+              title: 'Reserva modificada',
+              text: 'La reserva ha sido actualizada correctamente.',
+              confirmButtonColor: '#198754'
+            });
             this.barcoService.getBarcos();
             this.modalReserva.close();
           },
           error: (error) => {
-            alert('Error al modificar la reserva: ' + error.message);
+            switch (error.status) {
+              case 404:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Reserva no encontrada',
+                  text: 'No se pudo encontrar la reserva para modificarla.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+              case 409:
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Conflicto de plazas',
+                  text: 'No hay suficientes plazas disponibles para modificar la reserva.',
+                  confirmButtonColor: '#ffc107'
+                });
+                break;
+              case 500:
+              default:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error del servidor',
+                  text: 'Ha ocurrido un error inesperado al modificar la reserva.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+            }
           }
-        })
+        });
       } else {
         this.reservaService.crearReserva(reservaDto).subscribe({
           next: () => {
-            alert('Reserva creada correctamente');
+            Swal.fire({
+              icon: 'success',
+              title: 'Reserva creada',
+              text: 'La reserva se ha creado correctamente.',
+              confirmButtonColor: '#198754'
+            });
             this.formularioReserva.reset();
             this.mostrarSelectorPlazas = false;
             this.mostrarSelectorHora = false;
@@ -208,7 +245,33 @@ export class ReservaFormComponent {
             this.plazasDisponibles = 0;
           },
           error: (error) => {
-            alert('Error al crear la reserva: ' + error.message);
+            switch (error.status) {
+              case 404:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Barco no disponible',
+                  text: 'No se ha encontrado el barco solicitado para la reserva.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+              case 409:
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Plazas insuficientes',
+                  text: 'No hay suficientes plazas disponibles para completar esta reserva.',
+                  confirmButtonColor: '#ffc107'
+                });
+                break;
+              case 500:
+              default:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error del servidor',
+                  text: 'Ha ocurrido un error inesperado al crear la reserva.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+            }
           }
         });
       }

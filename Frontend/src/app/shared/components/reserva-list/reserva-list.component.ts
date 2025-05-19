@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ReservaFormComponent } from '../reserva-form/reserva-form.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxPaginationModule } from 'ngx-pagination';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'rb-reserva-list',
@@ -41,17 +42,50 @@ export class ReservaListComponent {
   }
 
   eliminarReserva(id: number): void {
-    if (!confirm('¿Estás seguro de eliminar esta reserva')) {
-      return;
-    }
-    this.reservaService.eliminarReserva(id).subscribe({
-      next: () => {
-        this.obtenerReservas();
-        this.reservasFiltradas();
-        alert('Reserva eliminada correctamente')
-      },
-      error: (err) => {
-        alert('No se pudo eliminar la reserva')
+    Swal.fire({
+      title: '¿Eliminar reserva?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.reservaService.eliminarReserva(id).subscribe({
+          next: () => {
+            this.obtenerReservas();
+            this.reservasFiltradas();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminada',
+              text: 'La reserva se ha eliminado correctamente.',
+              confirmButtonColor: '#198754'
+            });
+          },
+          error: (err) => {
+            switch (err.status) {
+              case 404:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'No encontrada',
+                  text: 'No se pudo encontrar la reserva a eliminar.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+              case 500:
+              default:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error del servidor',
+                  text: 'Ocurrió un error al intentar eliminar la reserva.',
+                  confirmButtonColor: '#dc3545'
+                });
+                break;
+            }
+          }
+        });
       }
     });
   }
@@ -59,32 +93,27 @@ export class ReservaListComponent {
   modificarReserva(reserva: Reserva): void {
     const modalReservas = this.modalService.open(ReservaFormComponent, { size: 'lg' });
     modalReservas.componentInstance.reservaEditar = reserva;
-    modalReservas.closed.subscribe({
-      next: () => {
-        this.obtenerReservas();
-        this.reservasFiltradas();
-      },
-      error: () => {
-        alert('No se pudo modificar la reserva')
-      }
+    modalReservas.closed.subscribe(() => {
+      this.obtenerReservas();
+      this.reservasFiltradas();
     });
   }
 
   reservasFiltradas(): Reserva[] {
-  const termino = this.terminoBusqueda.toLowerCase();
+    const termino = this.terminoBusqueda.toLowerCase();
 
-  return this.reservas.filter(r => {
-    const coincideTexto =
-      r.codigoReserva?.toLowerCase().includes(termino) ||
-      `${r.nombreCliente} ${r.apellidoCliente}`.toLowerCase().includes(termino);
+    return this.reservas.filter(r => {
+      const coincideTexto =
+        r.codigoReserva?.toLowerCase().includes(termino) ||
+        `${r.nombreCliente} ${r.apellidoCliente}`.toLowerCase().includes(termino);
 
-    const coincideFecha =
-      !this.fechaFiltro || r.fechaReserva.startsWith(this.fechaFiltro);
+      const coincideFecha =
+        !this.fechaFiltro || r.fechaReserva.startsWith(this.fechaFiltro);
 
-    const coincideHora =
-      !this.horaFiltro || r.fechaReserva.includes(this.horaFiltro);
+      const coincideHora =
+        !this.horaFiltro || r.fechaReserva.includes(this.horaFiltro);
 
-    return coincideTexto && coincideFecha && coincideHora;
-  });
-}
+      return coincideTexto && coincideFecha && coincideHora;
+    });
+  }
 }
