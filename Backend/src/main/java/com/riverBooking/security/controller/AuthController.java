@@ -30,13 +30,17 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest){
-		Authentication auth = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
-		
-		authManager.authenticate(auth);
-		
-		String token = jwtUtil.generarToken(loginRequest.getUsername());
-		
-		return ResponseEntity.ok(new LoginResponseDTO(token, loginRequest.getUsername()));
+	public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+	    Authentication auth = new UsernamePasswordAuthenticationToken(
+	        loginRequest.getUsername(),
+	        loginRequest.getPassword()
+	    );
+
+	    authManager.authenticate(auth);
+
+	    String token = jwtUtil.generarToken(loginRequest.getUsername());
+
+	    return ResponseEntity.ok(new LoginResponseDTO(token, loginRequest.getUsername()));
 	}
+
 }

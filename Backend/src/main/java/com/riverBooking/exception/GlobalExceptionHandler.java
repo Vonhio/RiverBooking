@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiError> handleBarcoException(BarcoNoEncontradoException ex) {
 
 		return new ResponseEntity<>(buildError(HttpStatus.NOT_FOUND, ex), HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex) {
+	    	    return new ResponseEntity<>(buildError(HttpStatus.UNAUTHORIZED, ex), HttpStatus.UNAUTHORIZED);
 	}
 
 	public ApiError buildError(HttpStatus status, Exception mensaje) {

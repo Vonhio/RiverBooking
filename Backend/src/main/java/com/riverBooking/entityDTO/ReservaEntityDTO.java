@@ -16,6 +16,7 @@ public class ReservaEntityDTO {
 	private String tipoReserva;
 
 	@Min(value = 1, message = "Debe haber al menos 1 persona")
+	@Max(value = 14, message = "El número máximo de personas es 14")
 	private int numPersonas;
 
 	@NotBlank(message = "El nombre del cliente es obligatorio")
