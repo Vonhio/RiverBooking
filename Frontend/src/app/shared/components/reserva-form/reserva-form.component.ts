@@ -136,19 +136,21 @@ export class ReservaFormComponent {
 
         this.plazasDisponibles = plazasLibres;
         this.mostrarSelectorPlazas = true;
-
-        this.formularioReserva.patchValue({
-          numPersonas: plazasLibres > 0 ? 1 : null
-        });
       });
     }
   }
 
   actualizarPrecio(): void {
-    const plazasReservadas = this.formularioReserva.get('numPersonas')?.value ?? 0;
+    const plazasReservadas = this.formularioReserva.get('numPersonas')!.value ?? 0;
+    const barco = this.formularioReserva.get('barcoId')!.value;
 
-    const precioTotal = plazasReservadas * 15.00;
-    this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    if(barco == 1){
+      const precioTotal = plazasReservadas * 25.00;
+      return this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    } else {
+      const precioTotal = plazasReservadas * 30.00;
+      this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    }
 
   }
 
@@ -234,8 +236,10 @@ export class ReservaFormComponent {
             Swal.fire({
               icon: 'success',
               title: 'Reserva creada',
-              text: 'La reserva se ha creado correctamente.',
+              text: 'La reserva se ha creado correctamente. En breves recibirá un correo con toda la información. ¡Muchas gracias por confiar en nosotros!',
               confirmButtonColor: '#198754'
+            }).then(() => {
+              this.modalReserva.close();
             });
             this.formularioReserva.reset();
             this.mostrarSelectorPlazas = false;

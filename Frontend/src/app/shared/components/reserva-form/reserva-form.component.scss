@@ -14,10 +14,56 @@ $bg-color: #f7f8fd;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
+.rb-modal-wrapper.classic-form {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 100%;
+}
+
 .rb-modal-wrapper form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.form-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-icon {
+  background: linear-gradient(135deg, $primary-color 60%, #fff 100%);
+  color: #fff;
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+}
+
+.form-title {
+  text-align: center;
+  color: $primary-color;
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.form-desc {
+  text-align: center;
+  color: #555;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 .form-group {

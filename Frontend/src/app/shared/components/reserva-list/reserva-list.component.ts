@@ -41,9 +41,9 @@ export class ReservaListComponent {
     });
   }
 
-  eliminarReserva(id: number): void {
+  eliminarReserva(id: number, codigoReserva: string): void {
     Swal.fire({
-      title: '¿Eliminar reserva?',
+      title: '¿Eliminar reserva con código de reserva ' + codigoReserva + '?',
       text: 'Esta acción no se puede deshacer.',
       icon: 'warning',
       showCancelButton: true,
@@ -59,7 +59,7 @@ export class ReservaListComponent {
             this.reservasFiltradas();
             Swal.fire({
               icon: 'success',
-              title: 'Eliminada',
+              title: 'Reserva eliminada',
               text: 'La reserva se ha eliminado correctamente.',
               confirmButtonColor: '#198754'
             });
