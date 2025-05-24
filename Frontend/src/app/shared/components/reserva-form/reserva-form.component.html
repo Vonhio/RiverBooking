@@ -1,13 +1,17 @@
 <div class="rb-modal-wrapper classic-form">
   <div class="form-header">
-    <div class="form-icon">
-      <i class="fa fa-info-circle" aria-hidden="true"></i>
-    </div>
+
     <ng-container *ngIf="!reservaEditar; else editarTitulo">
+    <div class="form-icon">
+      <i class="fa fa-user-circle" aria-hidden="true"></i>
+    </div>
       <h2 class="form-title">Reserva tu barco</h2>
       <p class="form-desc">¡Vive una experiencia única en el río!<br>Rellena el formulario para reservar tu embarcación.</p>
     </ng-container>
     <ng-template #editarTitulo>
+    <div class="form-icon">
+      <i class="fa fa-info-circle" aria-hidden="true"></i>
+    </div>
       <h2 class="form-title">Editar reserva</h2>
       <p class="form-desc">Modifica los datos de la reserva y guarda los cambios.</p>
     </ng-template>
