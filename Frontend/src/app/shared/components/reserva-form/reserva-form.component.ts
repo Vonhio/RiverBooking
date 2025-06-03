@@ -32,7 +32,7 @@ export class ReservaFormComponent {
   listaHoras: string[] = [];
   plazasArray: number[] = [];
   plazasDisponibles: number = 0;
-  tipoReserva: string[] = ['compartido'];
+  tipoReserva: string[] = ['Compartido', 'Privado'];
   fechaMinima: string = new Date().toISOString().split('T')[0];
 
   mostrarSelectorHora: boolean = false;
@@ -97,7 +97,7 @@ export class ReservaFormComponent {
     const hoy = new Date().toISOString().split('T')[0];
 
     if (fechaSeleccionada) {
-      if (fechaSeleccionada === hoy) {
+      if (fechaSeleccionada === hoy && this.reservaEditar == null) {
         const horaActual = new Date().getHours();
         this.listaHoras = this.horasBase.filter(hora => {
           if (hora.length === 0) {
