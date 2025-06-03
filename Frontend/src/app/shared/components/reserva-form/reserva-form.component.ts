@@ -32,12 +32,13 @@ export class ReservaFormComponent {
   listaHoras: string[] = [];
   plazasArray: number[] = [];
   plazasDisponibles: number = 0;
-  tipoReserva: string[] = ['Compartido'];
+  tipoReserva: string[] = ['compartido'];
   fechaMinima: string = new Date().toISOString().split('T')[0];
 
   mostrarSelectorHora: boolean = false;
   mostrarSelectorPlazas: boolean = false;
   hayPlazas: boolean = false;
+  hayHoras: boolean = false;
 
   formularioReserva = this.fb.group({
     barcoId: this.fb.control<number | null>(null, Validators.required),
@@ -99,8 +100,14 @@ export class ReservaFormComponent {
       if (fechaSeleccionada === hoy) {
         const horaActual = new Date().getHours();
         this.listaHoras = this.horasBase.filter(hora => {
+          if (hora.length === 0) {
+            this.hayHoras = false;
+            return;
+          }
           const [h] = hora.split(':');
-          return parseInt(h, 10) > horaActual;
+          parseInt(h, 10) > horaActual;
+          this.hayHoras = true;
+          return;
         });
       } else {
         this.listaHoras = [...this.horasBase];
@@ -144,7 +151,7 @@ export class ReservaFormComponent {
     const plazasReservadas = this.formularioReserva.get('numPersonas')!.value ?? 0;
     const barco = this.formularioReserva.get('barcoId')!.value;
 
-    if(barco == 1){
+    if (barco == 1) {
       const precioTotal = plazasReservadas * 25.00;
       return this.formularioReserva.patchValue({ precioTotal: precioTotal });
     } else {
