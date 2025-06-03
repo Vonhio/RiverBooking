@@ -42,7 +42,7 @@
         formControlName="tipoReserva"
         [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched"
       >
-        <option [ngValue]="null" disabled selected>Seleccione un tipo de reserva</option>
+        <option [ngValue]="''" disabled selected>Seleccione un tipo de reserva</option>
         <option *ngFor="let tp of tipoReserva" [value]="tp">{{ tp }}</option>
       </select>
       <div class="error-message">Debe seleccionar un tipo de reserva.</div>
@@ -82,7 +82,7 @@
 
     <!-- PLAZAS -->
     <ng-container *ngIf="mostrarSelectorPlazas">
-      <ng-container *ngIf="plazasDisponibles > 0; else sinPlazas">
+      <ng-container *ngIf="plazasDisponibles > 0 || reservaEditar != null; else sinPlazas">
         <div class="form-group">
           <label class="form-label" for="plazas">Plazas</label>
           <select

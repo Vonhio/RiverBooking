@@ -60,15 +60,13 @@ export class ReservaFormComponent {
 
 
     if (this.reservaEditar) {
-      this.mostrarSelectorHora = true
-      this.mostrarSelectorPlazas = true;
 
       const [fecha, hora] = this.reservaEditar.fechaReserva.split('T');
 
       this.formularioReserva.patchValue({
         barcoId: this.reservaEditar.barcoId,
         fecha: fecha,
-        hora: hora,
+        hora: hora.slice(0, 5), // Formato HH:mm
         numPersonas: this.reservaEditar.numPersonas,
         nombreCliente: this.reservaEditar.nombreCliente,
         apellidoCliente: this.reservaEditar.apellidoCliente,
@@ -79,7 +77,7 @@ export class ReservaFormComponent {
       });
 
       this.cambioFecha();
-      setTimeout(this.cambioFecha, 1000);
+      this.cambioHora();
     }
   }
   // Método para implementación de nuevas reservas. Aun no existen tales reservas, solo compartida.
@@ -114,8 +112,7 @@ export class ReservaFormComponent {
       }
 
       this.mostrarSelectorHora = true;
-      this.formularioReserva.patchValue({ hora: null, numPersonas: null });
-      this.mostrarSelectorPlazas = false;
+      this.reservaEditar != null ? this.mostrarSelectorPlazas = true : this.mostrarSelectorPlazas = false;
     }
   }
 
@@ -128,9 +125,8 @@ export class ReservaFormComponent {
       this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
         let plazasLibres: number;
-        const barcoCambiado = barcoId === this.reservaEditar?.barcoId;
 
-        if (this.reservaEditar?.id && this.reservaEditar.numPersonas && barcoCambiado) {
+        if (this.reservaEditar != null) {
           plazasLibres = respuesta.plazasDisponibles + this.reservaEditar.numPersonas;
 
           this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
