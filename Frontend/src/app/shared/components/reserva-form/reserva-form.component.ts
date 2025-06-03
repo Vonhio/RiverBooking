@@ -125,16 +125,17 @@ export class ReservaFormComponent {
       this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
         let plazasLibres: number;
+        let cambioHora = hora !== this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
 
-        if (this.reservaEditar != null) {
+        if (this.reservaEditar != null && !cambioHora) {
           plazasLibres = respuesta.plazasDisponibles + this.reservaEditar.numPersonas;
 
           this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
 
         } else {
           plazasLibres = respuesta.plazasDisponibles;
-
           this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
+          this.formularioReserva.patchValue({ numPersonas: null });
         }
 
         this.plazasDisponibles = plazasLibres;
