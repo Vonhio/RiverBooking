@@ -63,6 +63,10 @@ export class ReservaFormComponent {
 
       const [fecha, hora] = this.reservaEditar.fechaReserva.split('T');
 
+      this.mostrarSelectorHora = true;
+      this.mostrarSelectorPlazas = true;
+      this.listaHoras = this.horasBase;
+
       this.formularioReserva.patchValue({
         barcoId: this.reservaEditar.barcoId,
         fecha: fecha,
@@ -76,7 +80,6 @@ export class ReservaFormComponent {
         precioTotal: this.reservaEditar.precioTotal
       });
 
-      this.cambioFecha();
       this.cambioHora();
     }
   }
@@ -94,26 +97,19 @@ export class ReservaFormComponent {
     const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
     const hoy = new Date().toISOString().split('T')[0];
 
-    if (fechaSeleccionada) {
-      if (fechaSeleccionada === hoy && this.reservaEditar == null) {
+      if (fechaSeleccionada === hoy) {
         const horaActual = new Date().getHours();
         this.listaHoras = this.horasBase.filter(hora => {
-          if (hora.length === 0) {
-            this.hayHoras = false;
-            return;
-          }
-          const [h] = hora.split(':');
-          parseInt(h, 10) > horaActual;
-          this.hayHoras = true;
-          return;
+          return horaActual < parseInt(hora.slice(0, 2))
         });
       } else {
         this.listaHoras = [...this.horasBase];
       }
 
       this.mostrarSelectorHora = true;
-      this.reservaEditar != null ? this.mostrarSelectorPlazas = true : this.mostrarSelectorPlazas = false;
-    }
+      this.mostrarSelectorPlazas = false;
+      this.formularioReserva.patchValue({ hora: null, numPersonas: null });
+
   }
 
   cambioHora() {
@@ -125,10 +121,11 @@ export class ReservaFormComponent {
       this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
         let plazasLibres: number;
-        let cambioHora = hora !== this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
+        let mismaHora = hora == this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
+        let mismoBarco = barcoId == this.reservaEditar?.barcoId;
 
-        if (this.reservaEditar != null && !cambioHora) {
-          plazasLibres = respuesta.plazasDisponibles + this.reservaEditar.numPersonas;
+        if (mismaHora && mismoBarco) {
+          plazasLibres = respuesta.plazasDisponibles + this.reservaEditar!.numPersonas;
 
           this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
 
@@ -140,6 +137,7 @@ export class ReservaFormComponent {
 
         this.plazasDisponibles = plazasLibres;
         this.mostrarSelectorPlazas = true;
+
       });
     }
   }
@@ -289,7 +287,7 @@ export class ReservaFormComponent {
   }
 
   private resetFechaHoraPlazas() {
-    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null });
+    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null, tipoReserva: '' });
     this.mostrarSelectorHora = false;
     this.mostrarSelectorPlazas = false;
     this.plazasArray = [];
