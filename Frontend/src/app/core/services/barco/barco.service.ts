@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../enviroments/enviroment';
+import { environment } from '../../../../environments/environment';
 import { Barco } from '../../../interfaces/barco.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
