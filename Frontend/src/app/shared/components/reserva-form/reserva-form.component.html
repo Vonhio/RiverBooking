@@ -41,6 +41,7 @@
         class="form-select"
         formControlName="tipoReserva"
         [class.is-invalid]="formularioReserva.get('tipoReserva')?.invalid && formularioReserva.get('tipoReserva')?.touched"
+        (change)="cambioTipoReserva()"
       >
         <option [ngValue]="''" disabled selected>Seleccione un tipo de reserva</option>
         <option *ngFor="let tp of tipoReserva" [value]="tp">{{ tp }}</option>

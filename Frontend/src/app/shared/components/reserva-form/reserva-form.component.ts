@@ -8,6 +8,8 @@ import { Barco } from '../../../interfaces/barco.model';
 import { Reserva } from '../../../interfaces/reserva.model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'rb-reserva-form',
@@ -83,33 +85,56 @@ export class ReservaFormComponent {
       this.cambioHora();
     }
   }
-  // Método para implementación de nuevas reservas. Aun no existen tales reservas, solo compartida.
   cambioTipoReserva() {
-
+    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null});
+    this.mostrarSelectorHora = false;
+    this.mostrarSelectorPlazas = false;
+    this.plazasArray = [];
   }
 
   cambioBarco() {
-    this.resetFechaHoraPlazas();
+    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null, tipoReserva: '' });
+    this.mostrarSelectorHora = false;
+    this.mostrarSelectorPlazas = false;
+    this.plazasArray = [];
 
   }
 
   cambioFecha() {
     const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
-    const hoy = new Date().toISOString().split('T')[0];
+    const esHoy = new Date().toISOString().split('T')[0] === fechaSeleccionada;
+    const horaActual = new Date().getHours();
 
-      if (fechaSeleccionada === hoy) {
-        const horaActual = new Date().getHours();
-        this.listaHoras = this.horasBase.filter(hora => {
-          return horaActual < parseInt(hora.slice(0, 2))
+    const horasFiltradas = this.horasBase.filter(hora => {
+      return esHoy ? horaActual < parseInt(hora.slice(0, 2)) : true;
+    });
+
+    switch (this.formularioReserva.get('tipoReserva')?.value) {
+      case 'Compartido':
+        this.listaHoras = horasFiltradas;
+
+        break;
+      case 'Privado': {
+        const barcoId = this.formularioReserva.get('barcoId')?.value!;
+        const peticiones = horasFiltradas.map(hora =>
+          this.reservaService.getInfoPlazas(`${fechaSeleccionada}T${hora}`, barcoId)
+            .pipe(
+              map(respuesta => ({ hora, disponible: respuesta.plazasDisponibles === 14 })),
+              catchError(() => of({ hora, disponible: false }))
+            )
+        );
+        forkJoin(peticiones).subscribe(resultados => {
+          this.listaHoras = resultados
+            .filter(r => r.disponible)
+            .map(r => r.hora);
         });
-      } else {
-        this.listaHoras = [...this.horasBase];
+        break;
       }
+    }
 
-      this.mostrarSelectorHora = true;
-      this.mostrarSelectorPlazas = false;
-      this.formularioReserva.patchValue({ hora: null, numPersonas: null });
-
+    this.mostrarSelectorHora = true;
+    this.mostrarSelectorPlazas = false;
+    this.formularioReserva.patchValue({ hora: null, numPersonas: null });
   }
 
   cambioHora() {
@@ -121,10 +146,10 @@ export class ReservaFormComponent {
       this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
 
         let plazasLibres: number;
-        let mismaHora = hora == this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
-        let mismoBarco = barcoId == this.reservaEditar?.barcoId;
+        const mismaHora = hora == this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
+        const mismoBarco = barcoId == this.reservaEditar?.barcoId;
 
-        if (mismaHora && mismoBarco) {
+        if (mismaHora && mismoBarco && tipoReserva === 'Compartido') {
           plazasLibres = respuesta.plazasDisponibles + this.reservaEditar!.numPersonas;
 
           this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
@@ -284,12 +309,5 @@ export class ReservaFormComponent {
     } else {
       this.formularioReserva.markAllAsTouched();
     }
-  }
-
-  private resetFechaHoraPlazas() {
-    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null, tipoReserva: '' });
-    this.mostrarSelectorHora = false;
-    this.mostrarSelectorPlazas = false;
-    this.plazasArray = [];
   }
 }
