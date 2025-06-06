@@ -8,7 +8,7 @@ import { Barco } from '../../../interfaces/barco.model';
 import { Reserva } from '../../../interfaces/reserva.model';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
@@ -104,30 +104,51 @@ export class ReservaFormComponent {
     const fechaSeleccionada = this.formularioReserva.get('fecha')?.value;
     const esHoy = new Date().toISOString().split('T')[0] === fechaSeleccionada;
     const horaActual = new Date().getHours();
+    const tipoReserva = this.formularioReserva.get('tipoReserva')?.value;
+    const barcoId = this.formularioReserva.get('barcoId')?.value!;
+    const mismoDia = fechaSeleccionada === this.reservaEditar?.fechaReserva.split('T')[0];
+    const horaReserva = this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
+    const mismoBarco = barcoId === this.reservaEditar?.barcoId;
 
     const horasFiltradas = this.horasBase.filter(hora => {
       return esHoy ? horaActual < parseInt(hora.slice(0, 2)) : true;
     });
 
-    switch (this.formularioReserva.get('tipoReserva')?.value) {
+    switch (tipoReserva) {
       case 'Compartido':
-        this.listaHoras = horasFiltradas;
-
-        break;
-      case 'Privado': {
-        const barcoId = this.formularioReserva.get('barcoId')?.value!;
         const peticiones = horasFiltradas.map(hora =>
           this.reservaService.getInfoPlazas(`${fechaSeleccionada}T${hora}`, barcoId)
             .pipe(
-              map(respuesta => ({ hora, disponible: respuesta.plazasDisponibles === 14 })),
+              map(respuesta => {
+                if (mismoDia &&
+                  hora === horaReserva && mismoBarco) {
+                  return { hora, disponible: true };
+                }
+                return { hora, disponible: !respuesta.esPrivado && respuesta.plazasDisponibles > 0 };
+              })
+            )
+        );
+        this.peticionesHorasDisponibles(peticiones);
+        break;
+
+      case 'Privado': {
+        const peticiones = horasFiltradas.map(hora =>
+          this.reservaService.getInfoPlazas(`${fechaSeleccionada}T${hora}`, barcoId)
+            .pipe(
+              map(respuesta => {
+                if (
+                  mismoDia &&
+                  hora === horaReserva &&
+                  respuesta.plazasDisponibles + this.reservaEditar!.numPersonas === 14
+                ) {
+                  return { hora, disponible: true };
+                }
+                return { hora, disponible: respuesta.plazasDisponibles === 14 };
+              }),
               catchError(() => of({ hora, disponible: false }))
             )
         );
-        forkJoin(peticiones).subscribe(resultados => {
-          this.listaHoras = resultados
-            .filter(r => r.disponible)
-            .map(r => r.hora);
-        });
+        this.peticionesHorasDisponibles(peticiones);
         break;
       }
     }
@@ -139,65 +160,48 @@ export class ReservaFormComponent {
 
   cambioHora() {
     const { barcoId, fecha, hora, tipoReserva } = this.formularioReserva.value;
+    if (!(barcoId && fecha && hora && tipoReserva)) return;
 
-    if (barcoId && fecha && hora && tipoReserva) {
-      const fechaHora = `${fecha}T${hora}`;
+    const fechaHora = `${fecha}T${hora}`;
+    this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
+      let plazasLibres: number = respuesta.plazasDisponibles;
 
-      this.reservaService.getInfoPlazas(fechaHora, barcoId).subscribe((respuesta) => {
+      if (this.reservaEditar) {
+        const mismaHora = hora === this.reservaEditar.fechaReserva.split('T')[1].slice(0, 5);
+        const mismoBarco = barcoId === this.reservaEditar.barcoId;
 
-        let plazasLibres: number;
-        const mismaHora = hora == this.reservaEditar?.fechaReserva.split('T')[1].slice(0, 5);
-        const mismoBarco = barcoId == this.reservaEditar?.barcoId;
-
-        if (mismaHora && mismoBarco && tipoReserva === 'Compartido') {
-          plazasLibres = respuesta.plazasDisponibles + this.reservaEditar!.numPersonas;
-
-          this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
-
+        if (mismaHora && mismoBarco) {
+          if (tipoReserva === 'Compartido') {
+            plazasLibres += this.reservaEditar.numPersonas;
+          } else if (tipoReserva === 'Privado') {
+            plazasLibres = respuesta.capacidadTotal ?? 14;
+          }
         } else {
-          plazasLibres = respuesta.plazasDisponibles;
-          this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
           this.formularioReserva.patchValue({ numPersonas: null });
         }
+      } else {
+        this.formularioReserva.patchValue({ numPersonas: null });
+      }
 
-        this.plazasDisponibles = plazasLibres;
-        this.mostrarSelectorPlazas = true;
-
-      });
-    }
+      this.plazasArray = Array.from({ length: plazasLibres }, (_, i) => i + 1);
+      this.plazasDisponibles = plazasLibres;
+      this.mostrarSelectorPlazas = true;
+    });
   }
 
   actualizarPrecio(): void {
     const plazasReservadas = this.formularioReserva.get('numPersonas')!.value ?? 0;
-    const barcoId = this.formularioReserva.get('barcoId')!.value;
-    const tipoReserva = this.formularioReserva.get('tipoReserva')!.value;
-    let precioTotal: number;
+    const barcoId = this.formularioReserva.get('barcoId')!.value ?? 0;
+    const tipoReserva = this.formularioReserva.get('tipoReserva')!.value ?? 'null';
 
-    if (tipoReserva === 'Compartido') {
-      switch (barcoId) {
-        case 1:
-          precioTotal = plazasReservadas * 25.00;
-          break;
-        case 2:
-          precioTotal = plazasReservadas * 30.00;
-          break;
-        default:
-          precioTotal = plazasReservadas * 30.00;
-          break;
-      }
-    } else {
-      switch (barcoId) {
-        case 1:
-          precioTotal = 150.00;
-          break
-        case 2:
-          precioTotal = 180.00;
-          break;
-        default:
-          precioTotal = 150.00;
-          break;
-      }
-    }
+
+    const precios: Record<string, Record<number, number>> = {
+      'Compartido': { 1: 25.00, 2: 30.00 },
+      'Privado': { 1: 150.00, 2: 180.00 }
+    };
+
+    let precioBase = precios[tipoReserva]?.[barcoId] ?? (tipoReserva === 'Privado' ? 150.00 : 30.00);
+    let precioTotal = tipoReserva === 'Compartido' ? plazasReservadas * precioBase : precioBase;
 
     this.formularioReserva.patchValue({ precioTotal: precioTotal });
   }
@@ -330,5 +334,13 @@ export class ReservaFormComponent {
     } else {
       this.formularioReserva.markAllAsTouched();
     }
+  }
+
+  peticionesHorasDisponibles(peticiones: Observable<any>[]): void {
+    forkJoin(peticiones).subscribe(resultados => {
+      this.listaHoras = resultados
+        .filter(r => r.disponible)
+        .map(r => r.hora);
+    });
   }
 }
