@@ -5,14 +5,17 @@ public class InformacionReservasDTO {
 	private int capacidadTotal;
 	private int plazasReservadas;
 	private int plazasDisponibles;
+	private boolean esPrivado;
 
 	public InformacionReservasDTO() {
 	}
 
-	public InformacionReservasDTO(int capacidadTotal, int plazasReservadas, int plazasDisponibles) {
+	public InformacionReservasDTO(int capacidadTotal, int plazasReservadas, int plazasDisponibles, boolean esPrivado) {
 		this.capacidadTotal = capacidadTotal;
 		this.plazasReservadas = plazasReservadas;
 		this.plazasDisponibles = plazasDisponibles;
+		this.esPrivado = esPrivado;
+
 	}
 
 	public int getCapacidadTotal() {
@@ -38,7 +41,13 @@ public class InformacionReservasDTO {
 	public void setPlazasDisponibles(int plazasDisponibles) {
 		this.plazasDisponibles = plazasDisponibles;
 	}
-	
-	
+
+	public boolean isEsPrivado() {
+		return esPrivado;
+	}
+
+	public void setEsPrivado(boolean esPrivado) {
+		this.esPrivado = esPrivado;
+	}
 
 }

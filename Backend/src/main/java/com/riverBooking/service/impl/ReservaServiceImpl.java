@@ -113,8 +113,9 @@ public class ReservaServiceImpl implements ReservaService {
 		int plazasTotales = barco.getCapacidad();
 		int plazasOcupadas = reservaRepository.numeroPlazasReservadas(fechaHora, barcoId);
 		int plazasLibres = plazasTotales - plazasOcupadas;
+		boolean esPrivado = reservaRepository.existeReservaPrivada(fechaHora, barcoId);
 
-		InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres);
+		InformacionReservasDTO infoPlazas = new InformacionReservasDTO(plazasTotales, plazasOcupadas, plazasLibres, esPrivado);
 		return infoPlazas;
 	}
 
