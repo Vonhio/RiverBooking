@@ -86,7 +86,7 @@ export class ReservaFormComponent {
     }
   }
   cambioTipoReserva() {
-    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null});
+    this.formularioReserva.patchValue({ fecha: null, hora: null, numPersonas: null, precioTotal: null });
     this.mostrarSelectorHora = false;
     this.mostrarSelectorPlazas = false;
     this.plazasArray = [];
@@ -169,16 +169,37 @@ export class ReservaFormComponent {
 
   actualizarPrecio(): void {
     const plazasReservadas = this.formularioReserva.get('numPersonas')!.value ?? 0;
-    const barco = this.formularioReserva.get('barcoId')!.value;
+    const barcoId = this.formularioReserva.get('barcoId')!.value;
+    const tipoReserva = this.formularioReserva.get('tipoReserva')!.value;
+    let precioTotal: number;
 
-    if (barco == 1) {
-      const precioTotal = plazasReservadas * 25.00;
-      return this.formularioReserva.patchValue({ precioTotal: precioTotal });
+    if (tipoReserva === 'Compartido') {
+      switch (barcoId) {
+        case 1:
+          precioTotal = plazasReservadas * 25.00;
+          break;
+        case 2:
+          precioTotal = plazasReservadas * 30.00;
+          break;
+        default:
+          precioTotal = plazasReservadas * 30.00;
+          break;
+      }
     } else {
-      const precioTotal = plazasReservadas * 30.00;
-      this.formularioReserva.patchValue({ precioTotal: precioTotal });
+      switch (barcoId) {
+        case 1:
+          precioTotal = 150.00;
+          break
+        case 2:
+          precioTotal = 180.00;
+          break;
+        default:
+          precioTotal = 150.00;
+          break;
+      }
     }
 
+    this.formularioReserva.patchValue({ precioTotal: precioTotal });
   }
 
   enviar(): void {
